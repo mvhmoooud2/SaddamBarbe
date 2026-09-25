@@ -117,9 +117,9 @@ export const testimonialsData: NewTestimonial[] = [
   },
   {
     customerName: "كريم محمود",
-    commentAr: "صدّام يعرف شغله كويس جداً. القصة طلعت زي ما كنت عايزها بالظبط.",
+    commentAr: "الحلاق عارف شغله كويس جداً. القصة طلعت زي ما كنت عايزها بالظبط.",
     commentEn:
-      "Saddam really knows his craft. The cut came out exactly as I wanted.",
+      "The barber really knows his craft. The cut came out exactly as I wanted.",
     rating: 5,
     isActive: true,
   },
