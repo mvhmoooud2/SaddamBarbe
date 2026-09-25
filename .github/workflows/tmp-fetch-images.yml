@@ -30,15 +30,14 @@ jobs:
           ls -l /tmp/raw
           file /tmp/raw/*.jpg
 
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq imagemagick
+
       - name: Report dimensions
         run: |
-          for f in /tmp/raw/*.jpg; do
-            if command -v magick >/dev/null; then
-              magick identify "$f"
-            else
-              identify "$f"
-            fi
-          done
+          identify /tmp/raw/*.jpg | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Optimize for web
         run: |
@@ -47,14 +46,10 @@ jobs:
           i=1
           for f in /tmp/raw/1.jpg /tmp/raw/2.jpg /tmp/raw/3.jpg /tmp/raw/4.jpg /tmp/raw/5.jpg /tmp/raw/6.jpg; do
             out="public/images/client-upload-$i.jpg"
-            if command -v magick >/dev/null; then
-              magick "$f" -auto-orient -resize '1800x1800>' -strip -interlace Plane -quality 82 "$out"
-            else
-              convert "$f" -auto-orient -resize '1800x1800>' -strip -interlace Plane -quality 82 "$out"
-            fi
+            magick "$f" -auto-orient -resize '1800x1800>' -strip -interlace Plane -quality 82 "$out"
             i=$((i+1))
           done
-          ls -lh public/images/client-upload-*.jpg
+          ls -lh public/images/client-upload-*.jpg | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Commit and push
         run: |
