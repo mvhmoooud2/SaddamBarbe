@@ -13,6 +13,7 @@ import Services from "@/components/Services";
 import Offers from "@/components/Offers";
 import Stats from "@/components/Stats";
 import GallerySlider from "@/components/GallerySlider";
+import Branches from "@/components/Branches";
 import BookingForm from "@/components/BookingForm";
 import Testimonials from "@/components/Testimonials";
 import Footer from "@/components/Footer";
@@ -83,6 +84,7 @@ export default async function HomePage() {
         <Offers offers={offersData} />
         <Stats />
         <GallerySlider />
+        <Branches />
         <BookingForm services={servicesData} />
         <Testimonials testimonials={testimonialsData} />
       </main>

@@ -9,6 +9,7 @@ const navLinks = [
   { href: "#services", label: "الخدمات" },
   { href: "#offers", label: "العروض" },
   { href: "#gallery", label: "معرض الصور" },
+  { href: "#branches", label: "فروعنا" },
   { href: "#booking", label: "احجز موعد" },
   { href: "#testimonials", label: "آراء العملاء" },
   { href: "#contact", label: "تواصل معنا" },
