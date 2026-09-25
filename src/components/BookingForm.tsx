@@ -11,20 +11,18 @@ import {
   Loader2,
   MessageCircle,
 } from "lucide-react";
-import type { Service, Barber } from "@/db/schema";
+import type { Service } from "@/db/schema";
 import { basePath } from "@/lib/base-path";
 import { siteConfig, whatsappLink } from "@/data/site-config";
 
 interface BookingFormProps {
   services: Service[];
-  barbers: Barber[];
 }
 
 const emptyForm = (services: Service[]) => ({
   customerName: "",
   customerPhone: "",
   serviceId: services.length > 0 ? String(services[0].id) : "",
-  barberId: "",
   date: "",
   time: "",
   notes: "",
@@ -37,7 +35,7 @@ function localToday() {
   return local.toISOString().split("T")[0];
 }
 
-export default function BookingForm({ services, barbers }: BookingFormProps) {
+export default function BookingForm({ services }: BookingFormProps) {
   const [formData, setFormData] = useState(() => emptyForm(services));
   const [isSubmitting, setIsSubmitting] = useState(false);
   // بنحددها بعد التحميل علشان مايحصلش اختلاف بين السيرفر والمتصفح (hydration)
@@ -69,14 +67,12 @@ export default function BookingForm({ services, barbers }: BookingFormProps) {
   /** نص رسالة الواتساب الجاهزة (بتُستخدم لما الـ API مش متاح) */
   const bookingText = () => {
     const service = services.find((item) => String(item.id) === formData.serviceId);
-    const barber = barbers.find((item) => String(item.id) === formData.barberId);
 
     return [
       `طلب حجز جديد من موقع ${siteConfig.nameAr}`,
       `الاسم: ${formData.customerName}`,
       `الموبايل: ${formData.customerPhone}`,
       `الخدمة: ${service ? service.nameAr : "غير محددة"}`,
-      `الحلاق: ${barber ? barber.nameAr : "أي حلاق متاح"}`,
       `الميعاد: ${formData.date} - ${formData.time}`,
       formData.notes ? `ملاحظات: ${formData.notes}` : "",
     ]
@@ -102,7 +98,6 @@ export default function BookingForm({ services, barbers }: BookingFormProps) {
           customerName: formData.customerName,
           customerPhone: formData.customerPhone,
           serviceId: Number(formData.serviceId),
-          barberId: formData.barberId ? Number(formData.barberId) : null,
           appointmentDate: appointmentDate.toISOString(),
           notes: formData.notes,
         }),
@@ -218,26 +213,6 @@ export default function BookingForm({ services, barbers }: BookingFormProps) {
                 {services.map((service) => (
                   <option key={service.id} value={service.id}>
                     {service.nameAr} - {Number(service.price).toFixed(0)} ج.م
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-[#f5f0e6]/80">
-                <User className="h-4 w-4 text-[#c9a227]" />
-                الحلاق (اختياري)
-              </label>
-              <select
-                name="barberId"
-                value={formData.barberId}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-[#c9a227]/20 bg-[#1a1a1a] px-4 py-3 text-[#f5f0e6] outline-none transition-colors focus:border-[#c9a227]"
-              >
-                <option value="">أي حلاق متاح</option>
-                {barbers.map((barber) => (
-                  <option key={barber.id} value={barber.id}>
-                    {barber.nameAr}
                   </option>
                 ))}
               </select>

@@ -1,10 +1,9 @@
 import { connection } from "next/server";
 import { db } from "@/db";
-import { services, barbers, testimonials, offers } from "@/db/schema";
+import { services, testimonials, offers } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import {
   fallbackServices,
-  fallbackBarbers,
   fallbackTestimonials,
   fallbackOffers,
 } from "@/data/fallback";
@@ -14,7 +13,6 @@ import Services from "@/components/Services";
 import Offers from "@/components/Offers";
 import Stats from "@/components/Stats";
 import GallerySlider from "@/components/GallerySlider";
-import Team from "@/components/Team";
 import BookingForm from "@/components/BookingForm";
 import Testimonials from "@/components/Testimonials";
 import Footer from "@/components/Footer";
@@ -31,7 +29,6 @@ async function loadSiteData() {
   if (process.env.STATIC_EXPORT === "1") {
     return {
       servicesData: fallbackServices,
-      barbersData: fallbackBarbers,
       testimonialsData: fallbackTestimonials,
       offersData: fallbackOffers,
     };
@@ -41,31 +38,25 @@ async function loadSiteData() {
   await connection();
 
   try {
-    const [servicesData, barbersData, testimonialsData, offersData] =
-      await Promise.all([
-        db
-          .select()
-          .from(services)
-          .where(eq(services.isActive, true))
-          .orderBy(services.id),
-        db
-          .select()
-          .from(barbers)
-          .where(eq(barbers.isActive, true))
-          .orderBy(barbers.id),
-        db
-          .select()
-          .from(testimonials)
-          .where(eq(testimonials.isActive, true))
-          .orderBy(testimonials.id),
-        db
-          .select()
-          .from(offers)
-          .where(eq(offers.isActive, true))
-          .orderBy(offers.id),
-      ]);
+    const [servicesData, testimonialsData, offersData] = await Promise.all([
+      db
+        .select()
+        .from(services)
+        .where(eq(services.isActive, true))
+        .orderBy(services.id),
+      db
+        .select()
+        .from(testimonials)
+        .where(eq(testimonials.isActive, true))
+        .orderBy(testimonials.id),
+      db
+        .select()
+        .from(offers)
+        .where(eq(offers.isActive, true))
+        .orderBy(offers.id),
+    ]);
 
-    return { servicesData, barbersData, testimonialsData, offersData };
+    return { servicesData, testimonialsData, offersData };
   } catch (error) {
     console.warn(
       "[fallback] قاعدة البيانات غير متاحة، يتم استخدام البيانات الثابتة:",
@@ -73,7 +64,6 @@ async function loadSiteData() {
     );
     return {
       servicesData: fallbackServices,
-      barbersData: fallbackBarbers,
       testimonialsData: fallbackTestimonials,
       offersData: fallbackOffers,
     };
@@ -81,7 +71,7 @@ async function loadSiteData() {
 }
 
 export default async function HomePage() {
-  const { servicesData, barbersData, testimonialsData, offersData } =
+  const { servicesData, testimonialsData, offersData } =
     await loadSiteData();
 
   return (
@@ -93,8 +83,7 @@ export default async function HomePage() {
         <Offers offers={offersData} />
         <Stats />
         <GallerySlider />
-        <Team barbers={barbersData} />
-        <BookingForm services={servicesData} barbers={barbersData} />
+        <BookingForm services={servicesData} />
         <Testimonials testimonials={testimonialsData} />
       </main>
       <Footer />
