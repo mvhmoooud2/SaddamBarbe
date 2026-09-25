@@ -56,7 +56,13 @@ export default function BookingForm({ services, barbers }: BookingFormProps) {
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
+
+      if (response.status === 404) {
+        throw new Error(
+          "الحجز الإلكتروني غير متاح في النسخة الثابتة — تواصل معنا مباشرة وسنؤكد موعدك فوراً."
+        );
+      }
 
       if (!response.ok) {
         throw new Error(data.error || "حدث خطأ أثناء الحجز");

@@ -8,7 +8,11 @@ const databaseUrl =
   process.env.DATABASE_URL ??
   (process.env.NODE_ENV === "production" ? undefined : LOCAL_DEV_DATABASE_URL);
 
-if (!databaseUrl) {
+// النسخة الثابتة (GitHub Pages) مش بتستخدم قاعدة البيانات أصلاً،
+// فمش هنرمي خطأ لو مفيش DATABASE_URL — الـ Pool بيتعمل كسول ومش بيتصل إلا عند الاستخدام
+const isStaticExport = process.env.STATIC_EXPORT === "1";
+
+if (!databaseUrl && !isStaticExport) {
   throw new Error("DATABASE_URL is required");
 }
 
