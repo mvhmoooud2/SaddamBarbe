@@ -77,7 +77,9 @@ export default function Offers({ offers }: OffersProps) {
   if (offers.length === 0) return null;
 
   const details = activeOffer ? offerDetails(activeOffer.detailsAr) : [];
-  const validUntil = activeOffer ? formatValidUntil(activeOffer.validUntil) : null;
+  const validUntil = activeOffer
+    ? formatValidUntil(activeOffer.validUntil)
+    : null;
 
   return (
     <section id="offers" className="section-padding bg-[#0f0f0f]">
@@ -91,92 +93,55 @@ export default function Offers({ offers }: OffersProps) {
             عروضنا وخصوماتنا
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-[#f5f0e6]/70">
-            اختر العرض المناسب لك واستفيد من أسعارنا المخفّضة. اضغط على صورة
-            أي عرض لمعرفة تفاصيله الكاملة وحجز موعدك فوراً.
+            اختر العرض المناسب لك واستفيد من أسعارنا المخفّضة. اضغط على صورة أي
+            عرض لمعرفة تفاصيله الكاملة وحجز موعدك فوراً.
           </p>
         </div>
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {offers.map((offer) => {
-            const percent = discountPercent(offer.oldPrice, offer.newPrice);
-
-            return (
-              <article
-                key={offer.id}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-[#c9a227]/20 bg-[#1a1a1a] transition-all duration-300 hover:-translate-y-2 hover:border-[#c9a227]/50 hover:shadow-[0_0_40px_rgba(201,162,39,0.12)]"
+          {offers.map((offer) => (
+            <article
+              key={offer.id}
+              className="group flex flex-col overflow-hidden rounded-2xl border border-[#c9a227]/20 bg-[#1a1a1a] transition-all duration-300 hover:-translate-y-2 hover:border-[#c9a227]/50 hover:shadow-[0_0_40px_rgba(201,162,39,0.12)]"
+            >
+              <button
+                type="button"
+                onClick={() => setActiveOffer(offer)}
+                className="relative block aspect-[5/3] w-full overflow-hidden text-right"
+                aria-label={`عرض تفاصيل ${offer.titleAr}`}
               >
+                <Image
+                  src={offer.imageUrl || "/images/hero.jpg"}
+                  alt={`${offer.titleAr} - السعر قبل العرض ${formatPrice(
+                    offer.oldPrice,
+                  )} جنيه وبعد العرض ${formatPrice(offer.newPrice)} جنيه`}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/70 via-transparent to-transparent" />
+
+                <span className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  <span className="rounded-full border border-[#c9a227] bg-[#0f0f0f]/85 px-4 py-2 text-sm font-semibold text-[#c9a227] backdrop-blur-sm">
+                    شاهد تفاصيل العرض
+                  </span>
+                </span>
+              </button>
+
+              <div className="flex flex-1 flex-col p-6">
+                <p className="mb-5 text-sm leading-relaxed text-[#f5f0e6]/70">
+                  {offer.descriptionAr}
+                </p>
+
                 <button
                   type="button"
                   onClick={() => setActiveOffer(offer)}
-                  className="relative block h-56 w-full overflow-hidden text-right"
-                  aria-label={`عرض تفاصيل ${offer.titleAr}`}
+                  className="mt-auto w-full rounded-full border border-[#c9a227]/40 py-3 text-sm font-semibold text-[#c9a227] transition-colors hover:bg-[#c9a227] hover:text-[#0f0f0f]"
                 >
-                  <Image
-                    src={offer.imageUrl || "/images/hero.jpg"}
-                    alt={offer.titleAr}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/30 to-transparent" />
-
-                  {offer.badgeAr && (
-                    <span className="absolute right-4 top-4 rounded-full bg-[#c9a227] px-3 py-1 text-xs font-bold text-[#0f0f0f]">
-                      {offer.badgeAr}
-                    </span>
-                  )}
-
-                  {percent > 0 && (
-                    <span className="absolute bottom-4 left-4 flex items-center gap-1 rounded-full bg-[#0f0f0f]/85 px-3 py-1 text-xs font-bold text-[#c9a227] backdrop-blur-sm">
-                      <BadgePercent className="h-3.5 w-3.5" />
-                      خصم {percent}%
-                    </span>
-                  )}
-
-                  <span className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                    <span className="rounded-full border border-[#c9a227] bg-[#0f0f0f]/85 px-4 py-2 text-sm font-semibold text-[#c9a227] backdrop-blur-sm">
-                      شاهد تفاصيل العرض
-                    </span>
-                  </span>
+                  تفاصيل العرض
                 </button>
-
-                <div className="flex flex-1 flex-col p-6">
-                  <h3 className="mb-2 text-xl font-bold text-[#f5f0e6]">
-                    {offer.titleAr}
-                  </h3>
-                  <p className="mb-5 text-sm leading-relaxed text-[#f5f0e6]/70">
-                    {offer.descriptionAr}
-                  </p>
-
-                  <div className="mt-auto flex items-end justify-between gap-3 border-t border-[#c9a227]/10 pt-4">
-                    <div>
-                      <span className="block text-xs text-[#f5f0e6]/40">
-                        قبل العرض
-                      </span>
-                      <span className="text-base font-bold text-[#f5f0e6]/40 line-through">
-                        {formatPrice(offer.oldPrice)} ج.م
-                      </span>
-                    </div>
-                    <div className="text-left">
-                      <span className="block text-xs text-[#c9a227]">
-                        بعد العرض
-                      </span>
-                      <span className="text-2xl font-black text-[#c9a227]">
-                        {formatPrice(offer.newPrice)} ج.م
-                      </span>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setActiveOffer(offer)}
-                    className="mt-4 w-full rounded-full border border-[#c9a227]/40 py-3 text-sm font-semibold text-[#c9a227] transition-colors hover:bg-[#c9a227] hover:text-[#0f0f0f]"
-                  >
-                    تفاصيل العرض
-                  </button>
-                </div>
-              </article>
-            );
-          })}
+              </div>
+            </article>
+          ))}
         </div>
 
         <p className="mt-10 text-center text-sm text-[#f5f0e6]/50">
@@ -196,35 +161,28 @@ export default function Offers({ offers }: OffersProps) {
             className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-[#c9a227]/30 bg-[#1a1a1a] shadow-[0_0_60px_rgba(201,162,39,0.15)]"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="relative h-56 w-full shrink-0">
-              <Image
-                src={activeOffer.imageUrl || "/images/hero.jpg"}
-                alt={activeOffer.titleAr}
-                fill
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/40 to-transparent" />
-
-              <button
-                type="button"
-                onClick={closeModal}
-                className="absolute left-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-[#c9a227]/30 bg-[#0f0f0f]/80 text-[#f5f0e6] backdrop-blur-sm transition-colors hover:bg-[#c9a227] hover:text-[#0f0f0f]"
-                aria-label="إغلاق"
-              >
-                <X className="h-5 w-5" />
-              </button>
-
-              {discountPercent(activeOffer.oldPrice, activeOffer.newPrice) > 0 && (
-                <span className="absolute bottom-4 right-4 rounded-full bg-[#c9a227] px-3 py-1 text-sm font-bold text-[#0f0f0f]">
-                  خصم {discountPercent(activeOffer.oldPrice, activeOffer.newPrice)}%
-                </span>
-              )}
-            </div>
-
             <div className="p-6 md:p-8">
-              <h3 className="mb-2 text-2xl font-bold text-[#f5f0e6]">
-                {activeOffer.titleAr}
-              </h3>
+              <div className="mb-6 flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-2xl font-bold text-[#f5f0e6]">
+                    {activeOffer.titleAr}
+                  </h3>
+                  {activeOffer.badgeAr && (
+                    <span className="mt-2 inline-block rounded-full bg-[#c9a227]/15 px-3 py-1 text-xs font-bold text-[#c9a227]">
+                      {activeOffer.badgeAr}
+                    </span>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#c9a227]/30 bg-[#0f0f0f] text-[#f5f0e6] transition-colors hover:bg-[#c9a227] hover:text-[#0f0f0f]"
+                  aria-label="إغلاق"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
               <p className="mb-6 text-sm leading-relaxed text-[#f5f0e6]/70">
                 {activeOffer.descriptionAr}
               </p>
@@ -242,14 +200,17 @@ export default function Offers({ offers }: OffersProps) {
                 <BadgePercent className="h-5 w-5 text-[#c9a227]" />
 
                 <div>
-                  <span className="block text-xs text-[#c9a227]">بعد العرض</span>
+                  <span className="block text-xs text-[#c9a227]">
+                    بعد العرض
+                  </span>
                   <span className="text-2xl font-black text-[#c9a227]">
                     {formatPrice(activeOffer.newPrice)} ج.م
                   </span>
                 </div>
 
                 <span className="ms-auto rounded-full bg-[#c9a227]/15 px-3 py-1 text-xs font-bold text-[#c9a227]">
-                  وفّرت {savings(activeOffer.oldPrice, activeOffer.newPrice)} ج.م
+                  وفّرت {savings(activeOffer.oldPrice, activeOffer.newPrice)}{" "}
+                  ج.م
                 </span>
               </div>
 
