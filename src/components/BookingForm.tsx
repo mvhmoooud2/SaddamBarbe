@@ -6,6 +6,7 @@ import {
   Clock,
   User,
   Phone,
+  MapPin,
   MessageSquare,
   Check,
   Loader2,
@@ -13,7 +14,8 @@ import {
 } from "lucide-react";
 import type { Service } from "@/db/schema";
 import { basePath } from "@/lib/base-path";
-import { siteConfig, whatsappLink } from "@/data/site-config";
+import { siteConfig, whatsappLinkTo } from "@/data/site-config";
+import { branches, branchWhatsappLinkWithMessage } from "@/data/branches";
 
 interface BookingFormProps {
   services: Service[];
@@ -23,6 +25,7 @@ const emptyForm = (services: Service[]) => ({
   customerName: "",
   customerPhone: "",
   serviceId: services.length > 0 ? String(services[0].id) : "",
+  branchId: branches.length > 0 ? branches[0].id : "",
   date: "",
   time: "",
   notes: "",
@@ -50,9 +53,11 @@ export default function BookingForm({ services }: BookingFormProps) {
     setMinDate(localToday());
   }, []);
 
+  // مواعيد الحجز مطابقة لمواعيد الفرعين الفعلية (من 11:00 صباحاً حتى بعد منتصف الليل)
   const availableTimes = [
-    "10:00", "11:00", "12:00", "13:00", "14:00",
-    "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00"
+    "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00",
+    "18:00", "19:00", "20:00", "21:00", "22:00", "23:00",
+    "00:00", "01:00",
   ];
 
   const handleChange = (
@@ -64,20 +69,37 @@ export default function BookingForm({ services }: BookingFormProps) {
     setWhatsappFallback(null);
   };
 
+  /** الفرع المختار في الفورم (ولو مفيش اختيار بيستخدم الفرع الأساسي) */
+  const selectedBranch = () =>
+    branches.find((branch) => branch.id === formData.branchId) ?? branches[0];
+
   /** نص رسالة الواتساب الجاهزة (بتُستخدم لما الـ API مش متاح) */
   const bookingText = () => {
     const service = services.find((item) => String(item.id) === formData.serviceId);
+    const branch = selectedBranch();
 
     return [
       `طلب حجز جديد من موقع ${siteConfig.nameAr}`,
       `الاسم: ${formData.customerName}`,
       `الموبايل: ${formData.customerPhone}`,
+      branch ? `الفرع: ${branch.nameAr}` : "",
       `الخدمة: ${service ? service.nameAr : "غير محددة"}`,
       `الميعاد: ${formData.date} - ${formData.time}`,
       formData.notes ? `ملاحظات: ${formData.notes}` : "",
     ]
       .filter(Boolean)
       .join("\n");
+  };
+
+  /**
+   * لينك واتساب الحجز — بيروح على رقم الفرع اللي العميل اختاره،
+   * مش على رقم واحد عام، علشان الحجز يوصل للفرع الصح.
+   */
+  const bookingWhatsappLink = (text: string) => {
+    const branch = selectedBranch();
+    return branch
+      ? branchWhatsappLinkWithMessage(branch, text)
+      : whatsappLinkTo(siteConfig.whatsapp, text);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -87,6 +109,7 @@ export default function BookingForm({ services }: BookingFormProps) {
     setWhatsappFallback(null);
 
     const text = bookingText();
+    const branch = selectedBranch();
 
     try {
       const appointmentDate = new Date(`${formData.date}T${formData.time}`);
@@ -99,7 +122,8 @@ export default function BookingForm({ services }: BookingFormProps) {
           customerPhone: formData.customerPhone,
           serviceId: Number(formData.serviceId),
           appointmentDate: appointmentDate.toISOString(),
-          notes: formData.notes,
+          // اسم الفرع بيتبعت جوه الملاحظات لأن جدول الحجوزات ملوش عمود للفرع
+          notes: [branch?.nameAr, formData.notes].filter(Boolean).join(" — "),
         }),
       });
 
@@ -124,14 +148,14 @@ export default function BookingForm({ services }: BookingFormProps) {
       }
 
       // مفيش API في النسخة دي (النسخة الثابتة على GitHub Pages)
-      setWhatsappFallback(whatsappLink(text));
+      setWhatsappFallback(bookingWhatsappLink(text));
       setMessage({
         type: "error",
         text: "الحجز الإلكتروني مش متاح في النسخة الحالية، بس ممكن تبعتلنا نفس التفاصيل على الواتساب في ضغطة واحدة.",
       });
     } catch {
       // الشبكة وقعت أو الـ API مش موجود → نكمّل على الواتساب
-      setWhatsappFallback(whatsappLink(text));
+      setWhatsappFallback(bookingWhatsappLink(text));
       setMessage({
         type: "error",
         text: "مش قادرين نوصّل للحجز الإلكتروني دلوقتي، ابعتلنا التفاصيل على الواتساب ونتأكدلك الميعاد فوراً.",
@@ -197,6 +221,28 @@ export default function BookingForm({ services }: BookingFormProps) {
               />
             </div>
 
+            {branches.length > 0 && (
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-[#f5f0e6]/80">
+                  <MapPin className="h-4 w-4 text-[#c9a227]" />
+                  الفرع
+                </label>
+                <select
+                  name="branchId"
+                  value={formData.branchId}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded-xl border border-[#c9a227]/20 bg-[#1a1a1a] px-4 py-3 text-[#f5f0e6] outline-none transition-colors focus:border-[#c9a227]"
+                >
+                  {branches.map((branch) => (
+                    <option key={branch.id} value={branch.id}>
+                      {branch.nameAr} — {branch.phoneDisplay}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm font-medium text-[#f5f0e6]/80">
                 <Calendar className="h-4 w-4 text-[#c9a227]" />
@@ -250,6 +296,7 @@ export default function BookingForm({ services }: BookingFormProps) {
                 {availableTimes.map((time) => (
                   <option key={time} value={time}>
                     {time}
+                    {Number(time.slice(0, 2)) < 3 ? " (بعد منتصف الليل)" : ""}
                   </option>
                 ))}
               </select>

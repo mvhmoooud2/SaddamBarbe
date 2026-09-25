@@ -4,7 +4,7 @@ const stats = [
   { icon: Users, value: "5000+", label: "عميل سعيد" },
   { icon: Scissors, value: "15+", label: "سنة خبرة" },
   { icon: Award, value: "20+", label: "جائزة" },
-  { icon: Clock, value: "12", label: "ساعة عمل يومياً" },
+  { icon: Clock, value: "15", label: "ساعة عمل يومياً" },
 ];
 
 export default function Stats() {

@@ -4,9 +4,18 @@ import { appointments, barbers, services } from "@/db/schema";
 import { and, eq, gte, lte, ne } from "drizzle-orm";
 
 // مواعيد العمل بتوقيت القاهرة (الموقع بيخدم عملاء في مصر)
-const OPENING_HOUR = 10;
-const CLOSING_HOUR = 22;
+// الفروع بتفتح 11:00 صباحاً وتقفل بعد منتصف الليل (2:00 / 2:30 صباحاً)،
+// فـ CLOSING_HOUR أصغر من OPENING_HOUR وده معناه إن الفترة بتعدي منتصف الليل.
+const OPENING_HOUR = 11;
+const CLOSING_HOUR = 2;
 const CAIRO_TIME_ZONE = "Africa/Cairo";
+
+/** هل الساعة دي جوه مواعيد العمل؟ (بيدعم الفترات اللي بتعدي منتصف الليل) */
+function isOpenHour(hour: number) {
+  return OPENING_HOUR <= CLOSING_HOUR
+    ? hour >= OPENING_HOUR && hour < CLOSING_HOUR
+    : hour >= OPENING_HOUR || hour < CLOSING_HOUR;
+}
 
 /** بيرجّع الساعة (0-23) بتوقيت القاهرة لأي تاريخ */
 function cairoHour(date: Date) {
@@ -98,10 +107,10 @@ export async function POST(request: Request) {
 
     // التحقق من ساعات العمل بتوقيت القاهرة (مش بتوقيت السيرفر)
     const hour = cairoHour(date);
-    if (hour < OPENING_HOUR || hour >= CLOSING_HOUR) {
+    if (!isOpenHour(hour)) {
       return NextResponse.json(
         {
-          error: `الحجز متاح من ${OPENING_HOUR}:00 صباحاً حتى ${CLOSING_HOUR}:00 مساءً (بتوقيت القاهرة)`,
+          error: `الحجز متاح من ${OPENING_HOUR}:00 صباحاً حتى ${CLOSING_HOUR}:00 صباحاً (بتوقيت القاهرة)`,
         },
         { status: 400 }
       );
