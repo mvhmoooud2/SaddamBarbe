@@ -1,5 +1,6 @@
 import { Scissors, Phone, MapPin, Clock, MessageCircle } from "lucide-react";
 import { siteConfig, whatsappLink } from "@/data/site-config";
+import { branches } from "@/data/branches";
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -60,16 +61,37 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-4 text-lg font-bold text-[#c9a227]">معلومات التواصل</h3>
-            <ul className="space-y-3 text-sm text-[#f5f0e6]/80">
+            <h3 className="mb-4 text-lg font-bold text-[#c9a227]">فروعنا والتواصل</h3>
+            <ul className="space-y-5 text-sm text-[#f5f0e6]/80">
+              {branches.map((branch) => (
+                <li key={branch.id} className="space-y-1.5">
+                  <p className="flex items-center gap-3 font-bold text-[#f5f0e6]">
+                    <MapPin className="h-4 w-4 shrink-0 text-[#c9a227]" />
+                    <a href="#branches" className="transition-colors hover:text-[#c9a227]">
+                      {branch.nameAr}
+                    </a>
+                  </p>
+                  <p className="ps-7 text-xs leading-relaxed text-[#f5f0e6]/60">
+                    {branch.addressAr}
+                  </p>
+                  <p className="flex items-center gap-3 ps-7">
+                    <Phone className="h-4 w-4 shrink-0 text-[#c9a227]" />
+                    <a
+                      href={branch.phoneHref}
+                      dir="ltr"
+                      className="transition-colors hover:text-[#c9a227]"
+                    >
+                      {branch.phoneDisplay}
+                    </a>
+                  </p>
+                  <p className="flex items-start gap-3 ps-7 text-xs text-[#f5f0e6]/60">
+                    <Clock className="mt-0.5 h-4 w-4 shrink-0 text-[#c9a227]" />
+                    <span>{branch.hoursAr}</span>
+                  </p>
+                </li>
+              ))}
               <li className="flex items-center gap-3">
-                <Phone className="h-4 w-4 text-[#c9a227]" />
-                <a href={siteConfig.phoneHref} className="transition-colors hover:text-[#c9a227]">
-                  {siteConfig.phoneDisplay}
-                </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <MessageCircle className="h-4 w-4 text-[#c9a227]" />
+                <MessageCircle className="h-4 w-4 shrink-0 text-[#c9a227]" />
                 <a
                   href={whatsappLink("السلام عليكم، عايز أحجز موعد في صالون صدام")}
                   target="_blank"
@@ -78,14 +100,6 @@ export default function Footer() {
                 >
                   احجز على واتساب
                 </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <MapPin className="h-4 w-4 text-[#c9a227]" />
-                <span>{siteConfig.address}</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <Clock className="h-4 w-4 text-[#c9a227]" />
-                <span>{siteConfig.hours}</span>
               </li>
             </ul>
           </div>

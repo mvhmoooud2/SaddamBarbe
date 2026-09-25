@@ -4,6 +4,7 @@ import {
   MessageCircle,
   Navigation,
   Phone,
+  Star,
   Store,
 } from "lucide-react";
 import {
@@ -40,8 +41,8 @@ export default function Branches() {
             أقرب فرع ليك مستنيك
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-[#f5f0e6]/70">
-            اختار الفرع الأقرب لك، وشوف مكانه على الخريطة، وكلمنا مباشرة أو
-            احجز على واتساب في ثواني.
+            فرعينا في القاهرة: حدائق القبة ومدينة نصر. اختار الفرع الأقرب لك،
+            وشوف مكانه على الخريطة، وكلمنا مباشرة أو احجز على واتساب في ثواني.
           </p>
         </div>
 
@@ -73,14 +74,31 @@ export default function Branches() {
 
               {/* التفاصيل */}
               <div className="flex flex-1 flex-col gap-5 p-6 md:p-8">
-                <div className="flex flex-wrap items-center gap-3">
-                  <h3 className="text-2xl font-bold text-[#f5f0e6]">
-                    {branch.nameAr}
-                  </h3>
-                  {branch.badgeAr && (
-                    <span className="rounded-full bg-[#c9a227]/15 px-3 py-1 text-xs font-bold text-[#c9a227]">
-                      {branch.badgeAr}
-                    </span>
+                <div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h3 className="text-2xl font-bold text-[#f5f0e6]">
+                      {branch.nameAr}
+                    </h3>
+                    {branch.badgeAr && (
+                      <span className="rounded-full bg-[#c9a227]/15 px-3 py-1 text-xs font-bold text-[#c9a227]">
+                        {branch.badgeAr}
+                      </span>
+                    )}
+                    {typeof branch.googleRating === "number" && (
+                      <span className="flex items-center gap-1 rounded-full border border-[#c9a227]/30 px-3 py-1 text-xs font-semibold text-[#c9a227]">
+                        <Star className="h-3 w-3 fill-[#c9a227]" />
+                        {branch.googleRating.toFixed(1)}
+                        {typeof branch.googleReviews === "number"
+                          ? ` (${branch.googleReviews} تقييم)`
+                          : ""}{" "}
+                        على خرائط جوجل
+                      </span>
+                    )}
+                  </div>
+                  {branch.listingNameAr && (
+                    <p className="mt-2 text-xs text-[#f5f0e6]/50">
+                      {branch.listingNameAr}
+                    </p>
                   )}
                 </div>
 
