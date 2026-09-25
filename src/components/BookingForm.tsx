@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import type { Service, Barber } from "@/db/schema";
 import { basePath } from "@/lib/base-path";
-import { whatsappLink } from "@/data/site-config";
+import { siteConfig, whatsappLink } from "@/data/site-config";
 
 interface BookingFormProps {
   services: Service[];
@@ -72,7 +72,7 @@ export default function BookingForm({ services, barbers }: BookingFormProps) {
     const barber = barbers.find((item) => String(item.id) === formData.barberId);
 
     return [
-      `طلب حجز جديد من موقع ${"SADDAM BARBER"}`,
+      `طلب حجز جديد من موقع ${siteConfig.nameAr}`,
       `الاسم: ${formData.customerName}`,
       `الموبايل: ${formData.customerPhone}`,
       `الخدمة: ${service ? service.nameAr : "غير محددة"}`,
