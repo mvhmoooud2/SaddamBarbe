@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "seed": "tsx src/db/seed.ts",
-    "images": "node scripts/generate-offer-images.mjs"
+    "images": "node scripts/generate-offer-images.mjs",
+    "dev:up": "bash scripts/dev-up.sh"
   },
   "dependencies": {
     "dotenv": "17.3.1",

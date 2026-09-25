@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Calendar, Clock, User, Phone, MessageSquare, Check, Loader2 } from "lucide-react";
 import type { Service, Barber } from "@/db/schema";
 
@@ -10,15 +10,15 @@ interface BookingFormProps {
 }
 
 export default function BookingForm({ services, barbers }: BookingFormProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => ({
     customerName: "",
     customerPhone: "",
-    serviceId: "",
+    serviceId: services.length > 0 ? String(services[0].id) : "",
     barberId: "",
     date: "",
     time: "",
     notes: "",
-  });
+  }));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
@@ -26,12 +26,6 @@ export default function BookingForm({ services, barbers }: BookingFormProps) {
     "10:00", "11:00", "12:00", "13:00", "14:00",
     "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00"
   ];
-
-  useEffect(() => {
-    if (services.length > 0 && !formData.serviceId) {
-      setFormData((prev) => ({ ...prev, serviceId: String(services[0].id) }));
-    }
-  }, [services, formData.serviceId]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
