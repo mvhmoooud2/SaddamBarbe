@@ -1,0 +1,58 @@
+# نشر نسخة ثابتة من الموقع على GitHub Pages
+# النسخة الثابتة بتشتغل بالبيانات الثابتة (fallback) لأن Pages مالهاش قاعدة بيانات أو API routes
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [arena/01a0da1d-saddambarber, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Remove API routes (غير متوافقة مع التصدير الثابت)
+        run: rm -rf src/app/api
+
+      - name: Make homepage static (التصدير الثابت مش بيقبل force-dynamic)
+        run: sed -i 's/export const dynamic = "force-dynamic";/export const dynamic = "auto";/' src/app/page.tsx
+
+      - name: Build static export
+        run: npx next build
+        env:
+          STATIC_EXPORT: "1"
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

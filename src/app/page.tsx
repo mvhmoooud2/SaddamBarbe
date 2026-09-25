@@ -18,10 +18,21 @@ import BookingForm from "@/components/BookingForm";
 import Testimonials from "@/components/Testimonials";
 import Footer from "@/components/Footer";
 
+// ملاحظة: في بناء GitHub Pages الثابت، الـ workflow بيحوّل السطر ده لـ "auto"
+// لأن التصدير الثابت مش بيقبل force-dynamic
 export const dynamic = "force-dynamic";
 
 /** بيقرأ الداتا من الداتابيز، ولو الداتابيز مش متاحة بيستخدم البيانات الثابتة */
 async function loadSiteData() {
+  // النسخة الثابتة مالهاش قاعدة بيانات → نستخدم البيانات الثابتة على طول
+  if (process.env.STATIC_EXPORT === "1") {
+    return {
+      servicesData: fallbackServices,
+      barbersData: fallbackBarbers,
+      testimonialsData: fallbackTestimonials,
+      offersData: fallbackOffers,
+    };
+  }
   try {
     const [servicesData, barbersData, testimonialsData, offersData] =
       await Promise.all([
