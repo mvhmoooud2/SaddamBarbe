@@ -46,7 +46,7 @@ jobs:
           i=1
           for f in /tmp/raw/1.jpg /tmp/raw/2.jpg /tmp/raw/3.jpg /tmp/raw/4.jpg /tmp/raw/5.jpg /tmp/raw/6.jpg; do
             out="public/images/client-upload-$i.jpg"
-            magick "$f" -auto-orient -resize '1800x1800>' -strip -interlace Plane -quality 82 "$out"
+            convert "$f" -auto-orient -resize '1800x1800>' -strip -interlace Plane -quality 82 "$out"
             i=$((i+1))
           done
           ls -lh public/images/client-upload-*.jpg | tee -a "$GITHUB_STEP_SUMMARY"
