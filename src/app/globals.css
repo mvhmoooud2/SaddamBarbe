@@ -38,6 +38,12 @@ body {
   border: 1px solid rgba(201, 162, 39, 0.2);
 }
 
+/* علشان الهيدر الثابت ما يغطّيش بداية الأقسام عند الضغط على لينكات التنقل */
+section[id],
+footer[id] {
+  scroll-margin-top: 5rem;
+}
+
 .section-padding {
   padding-top: 6rem;
   padding-bottom: 6rem;

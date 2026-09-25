@@ -13,7 +13,11 @@ const databaseUrl =
 const isStaticExport = process.env.STATIC_EXPORT === "1";
 
 if (!databaseUrl && !isStaticExport) {
-  throw new Error("DATABASE_URL is required");
+  // بدل ما الموقع يفصل خالص، بنكمّل بالبيانات الثابتة (fallback)
+  // وبنسجّل تحذير واضح علشان المشكلة تبان في اللوجز
+  console.warn(
+    "[db] متغير DATABASE_URL غير موجود — الموقع شغال بالبيانات الثابتة من src/data/seed-data.ts"
+  );
 }
 
 const globalForDb = globalThis as typeof globalThis & {

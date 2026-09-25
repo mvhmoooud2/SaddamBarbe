@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import type { Offer } from "@/db/schema";
+import { asset } from "@/lib/base-path";
 
 interface OffersProps {
   offers: Offer[];
@@ -111,7 +112,7 @@ export default function Offers({ offers }: OffersProps) {
                 aria-label={`عرض تفاصيل ${offer.titleAr}`}
               >
                 <Image
-                  src={offer.imageUrl || "/images/hero.jpg"}
+                  src={asset(offer.imageUrl || "/images/hero.jpg")}
                   alt={`${offer.titleAr} - السعر قبل العرض ${formatPrice(
                     offer.oldPrice,
                   )} جنيه وبعد العرض ${formatPrice(offer.newPrice)} جنيه`}

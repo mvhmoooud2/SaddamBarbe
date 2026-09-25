@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Award } from "lucide-react";
 import type { Barber } from "@/db/schema";
+import { asset } from "@/lib/base-path";
 
 interface TeamProps {
   barbers: Barber[];
@@ -30,7 +31,7 @@ export default function Team({ barbers }: TeamProps) {
             >
               <div className="relative mx-auto mb-6 h-48 w-48 overflow-hidden rounded-full border-2 border-[#c9a227]/30">
                 <Image
-                  src={barber.imageUrl || "/images/hero.jpg"}
+                  src={asset(barber.imageUrl || "/images/hero.jpg")}
                   alt={barber.nameAr}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-110"

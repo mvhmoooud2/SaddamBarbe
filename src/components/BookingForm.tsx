@@ -1,26 +1,56 @@
 "use client";
 
-import { useState } from "react";
-import { Calendar, Clock, User, Phone, MessageSquare, Check, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  Calendar,
+  Clock,
+  User,
+  Phone,
+  MessageSquare,
+  Check,
+  Loader2,
+  MessageCircle,
+} from "lucide-react";
 import type { Service, Barber } from "@/db/schema";
+import { basePath } from "@/lib/base-path";
+import { whatsappLink } from "@/data/site-config";
 
 interface BookingFormProps {
   services: Service[];
   barbers: Barber[];
 }
 
+const emptyForm = (services: Service[]) => ({
+  customerName: "",
+  customerPhone: "",
+  serviceId: services.length > 0 ? String(services[0].id) : "",
+  barberId: "",
+  date: "",
+  time: "",
+  notes: "",
+});
+
+/** تاريخ النهاردة بتوقيت المستخدم (مش UTC) علشان يمنع اختيار يوم عدّى */
+function localToday() {
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
+  return local.toISOString().split("T")[0];
+}
+
 export default function BookingForm({ services, barbers }: BookingFormProps) {
-  const [formData, setFormData] = useState(() => ({
-    customerName: "",
-    customerPhone: "",
-    serviceId: services.length > 0 ? String(services[0].id) : "",
-    barberId: "",
-    date: "",
-    time: "",
-    notes: "",
-  }));
+  const [formData, setFormData] = useState(() => emptyForm(services));
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // بنحددها بعد التحميل علشان مايحصلش اختلاف بين السيرفر والمتصفح (hydration)
+  const [minDate, setMinDate] = useState("");
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [whatsappFallback, setWhatsappFallback] = useState<string | null>(null);
+
+  useEffect(() => {
+    // التاريخ بيتحسب في المتصفح بعد التحميل، لأن السيرفر (أو وقت البناء في
+    // النسخة الثابتة) ممكن يكون بتوقيت مختلف فيطلع تحذير اختلاف في العرض
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMinDate(localToday());
+  }, []);
 
   const availableTimes = [
     "10:00", "11:00", "12:00", "13:00", "14:00",
@@ -33,17 +63,39 @@ export default function BookingForm({ services, barbers }: BookingFormProps) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setMessage(null);
+    setWhatsappFallback(null);
+  };
+
+  /** نص رسالة الواتساب الجاهزة (بتُستخدم لما الـ API مش متاح) */
+  const bookingText = () => {
+    const service = services.find((item) => String(item.id) === formData.serviceId);
+    const barber = barbers.find((item) => String(item.id) === formData.barberId);
+
+    return [
+      `طلب حجز جديد من موقع ${"SADDAM BARBER"}`,
+      `الاسم: ${formData.customerName}`,
+      `الموبايل: ${formData.customerPhone}`,
+      `الخدمة: ${service ? service.nameAr : "غير محددة"}`,
+      `الحلاق: ${barber ? barber.nameAr : "أي حلاق متاح"}`,
+      `الميعاد: ${formData.date} - ${formData.time}`,
+      formData.notes ? `ملاحظات: ${formData.notes}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setMessage(null);
+    setWhatsappFallback(null);
+
+    const text = bookingText();
 
     try {
       const appointmentDate = new Date(`${formData.date}T${formData.time}`);
 
-      const response = await fetch("/api/appointments", {
+      const response = await fetch(`${basePath}/api/appointments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -56,39 +108,43 @@ export default function BookingForm({ services, barbers }: BookingFormProps) {
         }),
       });
 
-      const data = await response.json().catch(() => ({}));
+      const contentType = response.headers.get("content-type") ?? "";
+      const data = contentType.includes("application/json")
+        ? await response.json().catch(() => null)
+        : null;
 
-      if (response.status === 404) {
-        throw new Error(
-          "الحجز الإلكتروني غير متاح في النسخة الثابتة — تواصل معنا مباشرة وسنؤكد موعدك فوراً."
-        );
+      if (response.ok) {
+        setMessage({
+          type: "success",
+          text: "تم حجز موعدك بنجاح! سنتواصل معك قريباً للتأكيد.",
+        });
+        setFormData(emptyForm(services));
+        return;
       }
 
-      if (!response.ok) {
-        throw new Error(data.error || "حدث خطأ أثناء الحجز");
+      // رسالة واضحة من السيرفر (وقت محجوز، خارج المواعيد، ...)
+      if (data?.error) {
+        setMessage({ type: "error", text: data.error });
+        return;
       }
 
-      setMessage({ type: "success", text: "تم حجز موعدك بنجاح! سنتواصل معك قريباً للتأكيد." });
-      setFormData({
-        customerName: "",
-        customerPhone: "",
-        serviceId: String(services[0]?.id || ""),
-        barberId: "",
-        date: "",
-        time: "",
-        notes: "",
-      });
-    } catch (error) {
+      // مفيش API في النسخة دي (النسخة الثابتة على GitHub Pages)
+      setWhatsappFallback(whatsappLink(text));
       setMessage({
         type: "error",
-        text: error instanceof Error ? error.message : "حدث خطأ أثناء الحجز",
+        text: "الحجز الإلكتروني مش متاح في النسخة الحالية، بس ممكن تبعتلنا نفس التفاصيل على الواتساب في ضغطة واحدة.",
+      });
+    } catch {
+      // الشبكة وقعت أو الـ API مش موجود → نكمّل على الواتساب
+      setWhatsappFallback(whatsappLink(text));
+      setMessage({
+        type: "error",
+        text: "مش قادرين نوصّل للحجز الإلكتروني دلوقتي، ابعتلنا التفاصيل على الواتساب ونتأكدلك الميعاد فوراً.",
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  const today = new Date().toISOString().split("T")[0];
 
   return (
     <section id="booking" className="section-padding bg-[#1a1a1a]">
@@ -121,6 +177,7 @@ export default function BookingForm({ services, barbers }: BookingFormProps) {
                 value={formData.customerName}
                 onChange={handleChange}
                 required
+                minLength={2}
                 placeholder="أدخل اسمك"
                 className="w-full rounded-xl border border-[#c9a227]/20 bg-[#1a1a1a] px-4 py-3 text-[#f5f0e6] outline-none transition-colors focus:border-[#c9a227]"
               />
@@ -137,7 +194,10 @@ export default function BookingForm({ services, barbers }: BookingFormProps) {
                 value={formData.customerPhone}
                 onChange={handleChange}
                 required
-                placeholder="01X XXXX XXXX"
+                inputMode="tel"
+                pattern="^[0-9+\s()-]{8,15}$"
+                title="اكتب رقم موبايل صحيح (مثال: 01012345678)"
+                placeholder="01012345678"
                 className="w-full rounded-xl border border-[#c9a227]/20 bg-[#1a1a1a] px-4 py-3 text-[#f5f0e6] outline-none transition-colors focus:border-[#c9a227]"
               />
             </div>
@@ -154,6 +214,7 @@ export default function BookingForm({ services, barbers }: BookingFormProps) {
                 required
                 className="w-full rounded-xl border border-[#c9a227]/20 bg-[#1a1a1a] px-4 py-3 text-[#f5f0e6] outline-none transition-colors focus:border-[#c9a227]"
               >
+                {services.length === 0 && <option value="">لا توجد خدمات متاحة</option>}
                 {services.map((service) => (
                   <option key={service.id} value={service.id}>
                     {service.nameAr} - {Number(service.price).toFixed(0)} ج.م
@@ -193,7 +254,7 @@ export default function BookingForm({ services, barbers }: BookingFormProps) {
                 value={formData.date}
                 onChange={handleChange}
                 required
-                min={today}
+                min={minDate || undefined}
                 className="w-full rounded-xl border border-[#c9a227]/20 bg-[#1a1a1a] px-4 py-3 text-[#f5f0e6] outline-none transition-colors focus:border-[#c9a227]"
               />
             </div>
@@ -237,15 +298,29 @@ export default function BookingForm({ services, barbers }: BookingFormProps) {
 
           {message && (
             <div
-              className={`mt-6 flex items-center gap-2 rounded-xl px-4 py-3 text-sm ${
+              className={`mt-6 flex items-start gap-2 rounded-xl px-4 py-3 text-sm ${
                 message.type === "success"
                   ? "bg-green-500/10 text-green-400"
-                  : "bg-red-500/10 text-red-400"
+                  : "bg-amber-500/10 text-amber-300"
               }`}
+              role="status"
+              aria-live="polite"
             >
-              {message.type === "success" && <Check className="h-4 w-4" />}
-              {message.text}
+              {message.type === "success" && <Check className="mt-0.5 h-4 w-4 shrink-0" />}
+              <span>{message.text}</span>
             </div>
+          )}
+
+          {whatsappFallback && (
+            <a
+              href={whatsappFallback}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-4 font-bold text-[#0f0f0f] transition-transform hover:scale-[1.02]"
+            >
+              <MessageCircle className="h-5 w-5" />
+              ابعت الحجز على واتساب
+            </a>
           )}
 
           <button
