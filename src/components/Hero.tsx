@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { ArrowDown, Calendar } from "lucide-react";
+import { asset } from "@/lib/base-path";
 
 export default function Hero() {
   return (
@@ -9,7 +10,7 @@ export default function Hero() {
     >
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/hero.jpg"
+          src={asset("/images/hero.jpg")}
           alt="SADDAM BARBER Shop Interior"
           fill
           className="object-cover opacity-40"

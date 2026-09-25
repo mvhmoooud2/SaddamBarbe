@@ -4,7 +4,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [arena/01a0da1d-saddambarber, main]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -30,16 +30,16 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Remove API routes (غير متوافقة مع التصدير الثابت)
-        run: rm -rf src/app/api
-
-      - name: Make homepage static (التصدير الثابت مش بيقبل force-dynamic)
-        run: sed -i 's/export const dynamic = "force-dynamic";/export const dynamic = "auto";/' src/app/page.tsx
-
+      # مهم: مسار النشر (NEXT_PUBLIC_BASE_PATH) لازم يطابق اسم المستودع
+      # (SaddamBarbe) وإلا ملفات CSS/JS/الصور كلها ترجع 404 والصفحة تظهر بدون تصميم
       - name: Build static export
-        run: npx next build
+        run: |
+          # API routes مش مدعومة في التصدير الثابت
+          rm -rf src/app/api
+          npx next build
         env:
           STATIC_EXPORT: "1"
+          NEXT_PUBLIC_BASE_PATH: /SaddamBarbe
 
       - uses: actions/configure-pages@v5
         with:

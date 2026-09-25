@@ -1,4 +1,5 @@
-import { Scissors, Phone, MapPin, Clock } from "lucide-react";
+import { Scissors, Phone, MapPin, Clock, MessageCircle } from "lucide-react";
+import { siteConfig, whatsappLink } from "@/data/site-config";
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -53,7 +54,7 @@ export default function Footer() {
               </span>
             </div>
             <p className="mt-4 text-sm leading-relaxed text-[#f5f0e6]/70">
-              صالون صدام للحلاقة يقدم تجربة حلاقة فاخرة بأيدي محترفين. نحرص على
+              {siteConfig.nameAr} يقدم تجربة حلاقة فاخرة بأيدي محترفين. نحرص على
               كل تفصيل لنمنحك المظهر الأنيق الذي تستحقه.
             </p>
           </div>
@@ -63,15 +64,28 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-[#f5f0e6]/80">
               <li className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-[#c9a227]" />
-                <span>+20 123 456 7890</span>
+                <a href={siteConfig.phoneHref} className="transition-colors hover:text-[#c9a227]">
+                  {siteConfig.phoneDisplay}
+                </a>
+              </li>
+              <li className="flex items-center gap-3">
+                <MessageCircle className="h-4 w-4 text-[#c9a227]" />
+                <a
+                  href={whatsappLink("السلام عليكم، عايز أحجز موعد في صالون صدام")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-colors hover:text-[#c9a227]"
+                >
+                  احجز على واتساب
+                </a>
               </li>
               <li className="flex items-center gap-3">
                 <MapPin className="h-4 w-4 text-[#c9a227]" />
-                <span>شارع التحرير، القاهرة، مصر</span>
+                <span>{siteConfig.address}</span>
               </li>
               <li className="flex items-center gap-3">
                 <Clock className="h-4 w-4 text-[#c9a227]" />
-                <span>يومياً من 10:00 صباحاً حتى 10:00 مساءً</span>
+                <span>{siteConfig.hours}</span>
               </li>
             </ul>
           </div>
@@ -80,7 +94,7 @@ export default function Footer() {
             <h3 className="mb-4 text-lg font-bold text-[#c9a227]">تابعنا</h3>
             <div className="flex gap-4">
               <a
-                href="https://instagram.com"
+                href={siteConfig.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-[#c9a227]/30 text-[#c9a227] transition-colors hover:bg-[#c9a227] hover:text-[#0f0f0f]"
@@ -89,7 +103,7 @@ export default function Footer() {
                 <InstagramIcon />
               </a>
               <a
-                href="https://facebook.com"
+                href={siteConfig.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-[#c9a227]/30 text-[#c9a227] transition-colors hover:bg-[#c9a227] hover:text-[#0f0f0f]"
@@ -102,7 +116,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 border-t border-[#c9a227]/10 py-6 text-center text-sm text-[#f5f0e6]/50">
-          © {new Date().getFullYear()} SADDAM BARBER. جميع الحقوق محفوظة.
+          © {new Date().getFullYear()} {siteConfig.nameEn}. جميع الحقوق محفوظة.
         </div>
       </div>
     </footer>

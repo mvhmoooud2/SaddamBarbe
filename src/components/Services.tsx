@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Clock, Scissors } from "lucide-react";
 import type { Service } from "@/db/schema";
+import { asset } from "@/lib/base-path";
 
 interface ServicesProps {
   services: Service[];
@@ -34,7 +35,7 @@ export default function Services({ services }: ServicesProps) {
             >
               <div className="relative h-56 overflow-hidden">
                 <Image
-                  src={service.imageUrl || "/images/hero.jpg"}
+                  src={asset(service.imageUrl || "/images/hero.jpg")}
                   alt={service.nameAr}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-110"

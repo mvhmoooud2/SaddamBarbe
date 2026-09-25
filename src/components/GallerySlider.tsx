@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { ChevronRight, ChevronLeft } from "lucide-react";
+import { asset } from "@/lib/base-path";
 
 const galleryImages = [
   { src: "/images/gallery-1.jpg", alt: "Gallery image 1" },
@@ -59,7 +60,7 @@ export default function GallerySlider() {
                 }`}
               >
                 <Image
-                  src={image.src}
+                  src={asset(image.src)}
                   alt={image.alt}
                   fill
                   className="object-cover"
@@ -113,7 +114,7 @@ export default function GallerySlider() {
               aria-label={image.alt}
             >
               <Image
-                src={image.src}
+                src={asset(image.src)}
                 alt={image.alt}
                 fill
                 className="object-cover"

@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { db } from "@/db";
 import { services, barbers, testimonials, offers } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -18,9 +19,11 @@ import BookingForm from "@/components/BookingForm";
 import Testimonials from "@/components/Testimonials";
 import Footer from "@/components/Footer";
 
-// ملاحظة: في بناء GitHub Pages الثابت، الـ workflow بيحوّل السطر ده لـ "auto"
-// لأن التصدير الثابت مش بيقبل force-dynamic
-export const dynamic = "force-dynamic";
+// ملاحظة مهمة:
+// في التشغيل العادي الصفحة لازم تقرأ من قاعدة البيانات مع كل طلب، وبنعمل ده
+// بنداء connection() جوه loadSiteData (ده بيخلي المسار dynamic من غير ما نحتاج
+// سطر export const dynamic = "force-dynamic" اللي التصدير الثابت بيرفضه).
+// في نسخة GitHub Pages الثابتة بنتخطى النداء ده لأن مفيش سيرفر أصلاً.
 
 /** بيقرأ الداتا من الداتابيز، ولو الداتابيز مش متاحة بيستخدم البيانات الثابتة */
 async function loadSiteData() {
@@ -33,6 +36,10 @@ async function loadSiteData() {
       offersData: fallbackOffers,
     };
   }
+
+  // بنستنى الطلب الفعلي علشان الصفحة تتولّد مع كل زيارة (بيانات حديثة دايماً)
+  await connection();
+
   try {
     const [servicesData, barbersData, testimonialsData, offersData] =
       await Promise.all([
