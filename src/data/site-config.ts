@@ -29,8 +29,8 @@ export const siteConfig = {
   /** مواعيد الفرع الأساسي */
   hours: primaryBranch.hoursAr,
 
-  instagram: "https://instagram.com",
-  facebook: "https://facebook.com",
+  instagram: "https://www.instagram.com/saddamsalon1",
+  facebook: "https://www.facebook.com/share/1PBLsWWDtb/",
 } as const;
 
 /** لينك واتساب على رقم معيّن مع رسالة جاهزة */
