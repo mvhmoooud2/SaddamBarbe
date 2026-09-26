@@ -1,17 +1,25 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Database, ExternalLink, LogOut, Settings2 } from "lucide-react";
+import {
+  Database,
+  ExternalLink,
+  LayoutDashboard,
+  LogOut,
+  Settings2,
+} from "lucide-react";
 import { adminResources } from "@/data/admin-fields";
 import ResourceManager from "./ResourceManager";
 import SettingsManager from "./SettingsManager";
 import DatabaseViewer from "./DatabaseViewer";
+import Overview from "./Overview";
 
 const SETTINGS_TAB = "settings";
 const DATABASE_TAB = "database";
+const OVERVIEW_TAB = "overview";
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState(adminResources[0].key);
+  const [activeTab, setActiveTab] = useState(OVERVIEW_TAB);
   const [branchOptions, setBranchOptions] = useState<
     { slug: string; name: string }[]
   >([]);
@@ -77,6 +85,17 @@ export default function AdminDashboard() {
         </div>
 
         <nav className="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-5 pb-3">
+          <button
+            onClick={() => setActiveTab(OVERVIEW_TAB)}
+            className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-bold transition-colors ${
+              activeTab === OVERVIEW_TAB
+                ? "bg-[#c9a227] text-[#0f0f0f]"
+                : "border border-[#c9a227]/25 text-[#f5f0e6]/70 hover:text-[#c9a227]"
+            }`}
+          >
+            <LayoutDashboard className="h-4 w-4" />
+            نظرة عامة
+          </button>
           {adminResources.map((item) => (
             <button
               key={item.key}
@@ -116,7 +135,9 @@ export default function AdminDashboard() {
       </header>
 
       <main className="mx-auto max-w-7xl px-5 py-6">
-        {activeTab === DATABASE_TAB ? (
+        {activeTab === OVERVIEW_TAB ? (
+          <Overview onOpenTab={setActiveTab} />
+        ) : activeTab === DATABASE_TAB ? (
           <DatabaseViewer />
         ) : activeTab === SETTINGS_TAB ? (
           <SettingsManager />
