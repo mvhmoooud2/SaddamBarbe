@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { count } from "drizzle-orm";
+import { count, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   appointments,
@@ -39,6 +39,44 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const tableName = searchParams.get("table");
+
+  // (0) تشخيص: بيقول الموقع متوصّل بأنهي قاعدة فعلاً، وهل أعمدة services موجودة فيها.
+  //     بيستخدم نفس اتصال DATABASE_URL اللي التعديل بيفشل عليه.
+  if (searchParams.get("diagnose") !== null) {
+    const diag: Record<string, unknown> = {
+      supabaseConfigured: isSupabaseConfigured,
+    };
+    try {
+      const info: any = await db.execute(sql`
+        select current_database() as database,
+               current_user as db_user,
+               inet_server_addr()::text as server_ip,
+               current_setting('server_version') as server_version
+      `);
+      diag.connection = (info.rows ?? info)[0] ?? null;
+    } catch (e: any) {
+      diag.connectionError = e?.message ?? String(e);
+    }
+    try {
+      const cols: any = await db.execute(sql`
+        select column_name
+        from information_schema.columns
+        where table_schema = 'public' and table_name = 'services'
+        order by ordinal_position
+      `);
+      const list = ((cols.rows ?? cols) as any[]).map((r) => r.column_name);
+      diag.servicesColumns = list;
+      diag.missingColumns = [
+        "display_name_ar",
+        "category_ar",
+        "branch_slugs",
+        "is_featured",
+      ].filter((c) => !list.includes(c));
+    } catch (e: any) {
+      diag.servicesColumnsError = e?.message ?? String(e);
+    }
+    return NextResponse.json(diag);
+  }
 
   // (1) لو تم طلب جدول معيّن
   if (tableName) {

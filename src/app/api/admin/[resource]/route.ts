@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/admin-auth";
 import { getResource } from "@/data/admin-fields";
-import { createRow, getTable, listRows, sanitizeBody } from "@/lib/admin-tables";
+import { createRow, describeDbError, getTable, listRows, sanitizeBody } from "@/lib/admin-tables";
 
 export const dynamic = "force-dynamic";
 
@@ -67,9 +67,10 @@ export async function POST(request: Request, { params }: Params) {
     const row = await createRow(resource, values);
     return NextResponse.json(row, { status: 201 });
   } catch (error: any) {
-    console.error(`[admin] فشل إضافة ${resource}:`, error);
+    const reason = describeDbError(error);
+    console.error(`[admin] فشل إضافة ${resource}:`, reason, error);
     return NextResponse.json(
-      { error: error?.message || "مش قادرين نحفظ البيانات دلوقتي" },
+      { error: `مش قادرين نحفظ البيانات: ${reason}` },
       { status: 503 }
     );
   }
