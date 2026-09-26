@@ -23,7 +23,7 @@ import { defaultSettings } from "@/data/settings-schema";
  * فمتشغلوش بعد ما تبدأ تعدّل من لوحة التحكم إلا لو عايز ترجع من الأول.
  * (الحجوزات مش بتتمسح)
  */
-async function seed() {
+export async function seedDatabase() {
   await db.delete(appointments);
   await db.delete(testimonials);
   await db.delete(barbers);
@@ -78,15 +78,20 @@ async function seed() {
     Object.entries(defaultSettings).map(([key, value]) => ({ key, value }))
   );
 
-  console.log(
-    `Database seeded successfully (${servicesData.length} خدمات، ${barbersData.length} حلاقين، ` +
-      `${offersData.length} عروض، ${branchesData.length} فروع، ${galleryData.length} صور معرض، ` +
-      `${Object.keys(defaultSettings).length} إعداد)`
-  );
-  process.exit(0);
+  return `Database seeded successfully (${servicesData.length} خدمات، ${barbersData.length} حلاقين، ` +
+    `${offersData.length} عروض، ${branchesData.length} فروع، ${galleryData.length} صور معرض، ` +
+    `${Object.keys(defaultSettings).length} إعداد)`;
 }
 
-seed().catch((error) => {
-  console.error("Seeding failed:", error);
-  process.exit(1);
-});
+// التشغيل المباشر: npm run seed
+if (process.argv[1]?.endsWith("seed.ts")) {
+  seedDatabase()
+    .then((message) => {
+      console.log(message);
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error("Seeding failed:", error);
+      process.exit(1);
+    });
+}

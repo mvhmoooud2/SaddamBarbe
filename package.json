@@ -11,7 +11,9 @@
     "typecheck": "tsc --noEmit",
     "seed": "tsx src/db/seed.ts",
     "images": "node scripts/generate-offer-images.mjs",
-    "dev:up": "bash scripts/dev-up.sh"
+    "dev:up": "bash scripts/dev-up.sh",
+    "db:init": "tsx src/db/init.ts",
+    "db:push": "drizzle-kit push --force"
   },
   "dependencies": {
     "dotenv": "17.3.1",

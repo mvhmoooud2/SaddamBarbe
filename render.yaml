@@ -1,0 +1,45 @@
+# ============================================================
+#  نشر الموقع على Render بضغطة واحدة (Blueprint)
+#
+#  الخطوات:
+#    1. ادخل https://dashboard.render.com/blueprints
+#    2. New Blueprint Instance → اختار المستودع ده
+#    3. Render هيقرا الملف ده ويعمل: موقع + قاعدة بيانات PostgreSQL
+#    4. هيسألك على ADMIN_PASSWORD → اكتب كلمة سر قوية للوحة التحكم
+#    5. Apply → استنى 3-5 دقايق → الرابط الدائم جاهز
+# ============================================================
+
+databases:
+  - name: saddam-barber-db
+    databaseName: saddam_barber
+    user: saddam
+    plan: free
+    region: frankfurt
+
+services:
+  - type: web
+    name: saddam-barber
+    runtime: node
+    plan: free
+    region: frankfurt
+    # بناء الموقع + إنشاء جداول قاعدة البيانات
+    buildCommand: npm ci && npm run db:push && npm run build
+    # زرع البيانات الافتراضية أول مرة بس، وبعدين تشغيل الموقع
+    startCommand: npm run db:init && npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: saddam-barber-db
+          property: connectionString
+      # كلمة سر لوحة التحكم /admin — Render هيسألك عليها وقت النشر
+      - key: ADMIN_PASSWORD
+        sync: false
+      # سر توقيع الجلسة — بيتولّد تلقائياً
+      - key: ADMIN_SECRET
+        generateValue: true
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
