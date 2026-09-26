@@ -128,6 +128,22 @@ export const galleryImages = pgTable("gallery_images", {
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
 });
 
+/**
+ * الصور المرفوعة من لوحة التحكم.
+ *
+ * بتتخزن جوه قاعدة البيانات نفسها (مش على قرص السيرفر) علشان تفضل موجودة
+ * حتى على الاستضافات المجانية اللي بتمسح الملفات مع كل نشر (Vercel مثلاً).
+ * بتتعرض عن طريق: /api/media/{id}
+ */
+export const media = pgTable("media", {
+  id: serial("id").primaryKey(),
+  fileName: varchar("file_name", { length: 255 }).notNull(),
+  mimeType: varchar("mime_type", { length: 100 }).notNull(),
+  sizeBytes: integer("size_bytes").notNull(),
+  data: text("data").notNull(), // base64
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+});
+
 /** إعدادات ونصوص الموقع (مفتاح/قيمة) — الاسم، الأرقام، السوشيال، عناوين الأقسام */
 export const siteSettings = pgTable("site_settings", {
   key: varchar("key", { length: 100 }).primaryKey(),
@@ -150,3 +166,4 @@ export type NewBranchRow = typeof branches.$inferInsert;
 export type GalleryImage = typeof galleryImages.$inferSelect;
 export type NewGalleryImage = typeof galleryImages.$inferInsert;
 export type SiteSetting = typeof siteSettings.$inferSelect;
+export type Media = typeof media.$inferSelect;

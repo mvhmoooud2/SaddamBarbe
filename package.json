@@ -13,7 +13,8 @@
     "images": "node scripts/generate-offer-images.mjs",
     "dev:up": "bash scripts/dev-up.sh",
     "db:init": "tsx src/db/init.ts",
-    "db:push": "drizzle-kit push --force"
+    "db:push": "drizzle-kit push --force",
+    "vercel-build": "npm run db:push && npm run db:init && next build"
   },
   "dependencies": {
     "dotenv": "17.3.1",

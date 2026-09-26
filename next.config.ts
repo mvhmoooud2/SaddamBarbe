@@ -19,8 +19,11 @@ if (isStatic && !basePath) {
   );
 }
 
+// على Vercel مفيش داعي لـ standalone (المنصة بتتولى التغليف بنفسها)
+const isVercel = Boolean(process.env.VERCEL);
+
 const nextConfig: NextConfig = {
-  output: isStatic ? "export" : "standalone",
+  output: isStatic ? "export" : isVercel ? undefined : "standalone",
   basePath,
   // التصدير الثابت مالهوش Image Optimization endpoint
   images: {
