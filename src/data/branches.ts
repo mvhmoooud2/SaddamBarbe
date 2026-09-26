@@ -9,6 +9,12 @@
  *   • فرع مدينة نصر:   https://maps.app.goo.gl/qFjCxjWv9eCKxH9X7
  * والإحداثيات (lat/lng) مستخرجة من نفس الصفحتين ومتأكد منها بمطابقتها
  * مع الـ Plus Code بتاع كل فرع (37HH+J6 و 387P+8M).
+ *
+ * التقييمات (googleRating / googleReviews) متراجعة من نفس الصفحتين
+ * (آخر مراجعة: 26 سبتمبر 2026):
+ *   • حدائق القبة: 4.3 من 21 تقييم
+ *   • مدينة نصر:   5.0
+ * لو التقييم اتغيّر على جوجل، حدّث الأرقام هنا بس وهتظهر في قسم «فروعنا».
  */
 
 export type Branch = {
@@ -64,6 +70,7 @@ export const branches: Branch[] = [
     lat: 30.0790509,
     lng: 31.2780675,
     googleRating: 4.3,
+    googleReviews: 21,
     mapsUrl: "https://maps.app.goo.gl/FvLTtjg1pLMVt4T2A",
   },
   {

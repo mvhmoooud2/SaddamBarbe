@@ -92,16 +92,32 @@ export default function Branches() {
                         {branch.badgeAr}
                       </span>
                     )}
-                    {typeof branch.googleRating === "number" && (
-                      <span className="flex items-center gap-1 rounded-full border border-[#c9a227]/30 px-3 py-1 text-xs font-semibold text-[#c9a227]">
-                        <Star className="h-3 w-3 fill-[#c9a227]" />
-                        {branch.googleRating.toFixed(1)}
-                        {typeof branch.googleReviews === "number"
-                          ? ` (${branch.googleReviews} تقييم)`
-                          : ""}{" "}
-                        على خرائط جوجل
-                      </span>
-                    )}
+                    {typeof branch.googleRating === "number" &&
+                      (branch.mapsUrl ? (
+                        <a
+                          href={branch.mapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={`شوف تقييمات ${branch.nameAr} على خرائط جوجل`}
+                          className="flex items-center gap-1 rounded-full border border-[#c9a227]/30 px-3 py-1 text-xs font-semibold text-[#c9a227] transition-colors hover:border-[#c9a227] hover:bg-[#c9a227]/10"
+                        >
+                          <Star className="h-3 w-3 fill-[#c9a227]" />
+                          {branch.googleRating.toFixed(1)}
+                          {typeof branch.googleReviews === "number"
+                            ? ` (${branch.googleReviews} تقييم)`
+                            : ""}{" "}
+                          على خرائط جوجل
+                        </a>
+                      ) : (
+                        <span className="flex items-center gap-1 rounded-full border border-[#c9a227]/30 px-3 py-1 text-xs font-semibold text-[#c9a227]">
+                          <Star className="h-3 w-3 fill-[#c9a227]" />
+                          {branch.googleRating.toFixed(1)}
+                          {typeof branch.googleReviews === "number"
+                            ? ` (${branch.googleReviews} تقييم)`
+                            : ""}{" "}
+                          على خرائط جوجل
+                        </span>
+                      ))}
                   </div>
                   {branch.listingNameAr && (
                     <p className="mt-2 text-xs text-[#f5f0e6]/50">
