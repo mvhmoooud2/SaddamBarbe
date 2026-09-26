@@ -4,7 +4,6 @@ import { services, barbers, testimonials, offers } from "./schema";
 import {
   servicesData,
   barbersData,
-  testimonialsData,
   offersData,
 } from "@/data/seed-data";
 
@@ -16,11 +15,10 @@ async function seed() {
 
   await db.insert(services).values(servicesData);
   await db.insert(barbers).values(barbersData);
-  await db.insert(testimonials).values(testimonialsData);
   await db.insert(offers).values(offersData);
 
   console.log(
-    `Database seeded successfully (${servicesData.length} خدمات، ${barbersData.length} حلاقين، ${testimonialsData.length} آراء، ${offersData.length} عروض)`
+    `Database seeded successfully (${servicesData.length} خدمات، ${barbersData.length} حلاقين، ${offersData.length} عروض)`
   );
   process.exit(0);
 }

@@ -3,7 +3,6 @@
 import type {
   NewService,
   NewBarber,
-  NewTestimonial,
   NewOffer,
 } from "@/db/schema";
 
@@ -86,7 +85,7 @@ export const servicesData: NewService[] = [
     isActive: true,
   },
   {
-    nameAr: "شوار",
+    nameAr: "سشوار",
     nameEn: "Blow Dry",
     descriptionAr: "تسريح وتجفيف الشعر بالسيشوار بلمسة نهائية مرتبة.",
     descriptionEn: "Hair drying and styling with a neat finishing touch.",
@@ -288,7 +287,7 @@ export const servicesData: NewService[] = [
     isActive: true,
   },
   {
-    nameAr: "باديكير يد",
+    nameAr: "مانيكير يد",
     nameEn: "Manicure",
     descriptionAr: "عناية كاملة باليدين: تقشير وترطيب وتهذيب الأظافر.",
     descriptionEn: "Complete hand care: exfoliation, moisturizing and nail care.",
@@ -312,7 +311,7 @@ export const servicesData: NewService[] = [
 
   // ===== 7) سبا واسترخاء =====
   {
-    nameAr: "ساونا علاجي",
+    nameAr: "ساونا علاجية",
     nameEn: "Therapeutic Sauna",
     descriptionAr: "جلسة ساونا لفتح المسام وتنشيط الدورة الدموية وتهدئة الجسم.",
     descriptionEn: "A sauna session to open pores, boost circulation and relax the body.",
@@ -403,37 +402,9 @@ export const barbersData: NewBarber[] = [
   },
 ];
 
-export const testimonialsData: NewTestimonial[] = [
-  {
-    customerName: "عمر خالد",
-    commentAr:
-      "أفضل صالون حلاقة زرته على الإطلاق. الخدمة ممتازة والأجواء رائعة.",
-    commentEn:
-      "The best barbershop I've ever visited. Excellent service and great atmosphere.",
-    rating: 5,
-    isActive: true,
-  },
-  {
-    customerName: "كريم محمود",
-    commentAr: "الحلاق عارف شغله كويس جداً. القصة طلعت زي ما كنت عايزها بالظبط.",
-    commentEn:
-      "The barber really knows his craft. The cut came out exactly as I wanted.",
-    rating: 5,
-    isActive: true,
-  },
-  {
-    customerName: "يوسف سامي",
-    commentAr: "نظافة واحترافية عالية. سعر مناسب جداً مقابل الجودة.",
-    commentEn:
-      "High cleanliness and professionalism. Very fair price for the quality.",
-    rating: 4,
-    isActive: true,
-  },
-];
-
 export const offersData: NewOffer[] = [
   {
-    titleAr: "عرض العريس VIP",
+    titleAr: "عرض العريس VIP 👑",
     titleEn: "Groom VIP Package",
     descriptionAr:
       "تجربة متكاملة تخليك في أفضل لوك وأعلى استرخاء قبل أهم يوم في حياتك.",
@@ -446,8 +417,8 @@ export const offersData: NewOffer[] = [
       "وكس كامل.",
       "صبغة شعر.",
       "توبيك لفراغات الشعر.",
-      "باديكير يد + بدكير قدم.",
-      "ساونا واسترخاء.",
+      "مانيكير يد + باديكير قدم.",
+      "ساونا علاجية واسترخاء.",
       "استيم + ليفة مغربي.",
       "جاكوزي.",
       "جلسة ترميم شعر.",
@@ -494,8 +465,8 @@ export const offersData: NewOffer[] = [
       "وكس كامل.",
       "صبغة شعر.",
       "توبيك لفراغات الشعر.",
-      "باديكير يد.",
-      "ساونا واسترخاء.",
+      "مانيكير يد.",
+      "ساونا علاجية واسترخاء.",
       "استيم + ليفة مغربي.",
       "جاكوزي.",
       "مساج 45 دقيقة مع مدرب متخصص.",
@@ -540,7 +511,7 @@ export const offersData: NewOffer[] = [
       "وكس كامل.",
       "صبغة شعر.",
       "تويك.",
-      "باديكير يد.",
+      "مانيكير يد.",
       "تسبيتات.",
       "سشوار.",
       "مميزات إضافية: لوكر خاص، شاور، غرفة تغيير خاصة.",

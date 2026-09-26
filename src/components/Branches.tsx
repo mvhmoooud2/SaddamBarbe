@@ -124,6 +124,12 @@ export default function Branches() {
                       {branch.listingNameAr}
                     </p>
                   )}
+                  <p className="mt-3 rounded-xl border border-[#c9a227]/15 bg-[#0f0f0f]/60 px-3 py-2 text-xs leading-relaxed text-[#f5f0e6]/70">
+                    {branch.id === "nasr-city"
+                      ? "VIP MEN EXPERIENCE: الخدمات الأساسية + ساونا علاجية واستيم وحمام مغربي وجاكوزي ومساج."
+                      : "حلاقة وعناية: قص وشعر ودقن وبشرة وشعر وأظافر — بدون ساونا أو جاكوزي."
+                    }
+                  </p>
                 </div>
 
                 <ul className="space-y-3 text-sm text-[#f5f0e6]/80">
