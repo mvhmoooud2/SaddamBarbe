@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Phone, MapPin, Clock, MessageCircle } from "lucide-react";
+import { Phone, MapPin, Clock, MessageCircle, Mail } from "lucide-react";
 import { branches as staticBranches, type Branch } from "@/data/branches";
 import { asset } from "@/lib/base-path";
 import {
@@ -58,6 +58,7 @@ export default function Footer({
   settings,
 }: FooterProps) {
   const tiktok = setting(settings, "tiktok");
+  const email = setting(settings, "email");
 
   return (
     <footer id="contact" className="border-t border-[#c9a227]/20 bg-[#0f0f0f] pt-16">
@@ -108,6 +109,18 @@ export default function Footer({
                   </p>
                 </li>
               ))}
+              {email && (
+                <li className="flex items-center gap-3">
+                  <Mail className="h-4 w-4 shrink-0 text-[#c9a227]" />
+                  <a
+                    href={`mailto:${email}`}
+                    dir="ltr"
+                    className="transition-colors hover:text-[#c9a227]"
+                  >
+                    {email}
+                  </a>
+                </li>
+              )}
               <li className="flex items-center gap-3">
                 <MessageCircle className="h-4 w-4 shrink-0 text-[#c9a227]" />
                 <a
