@@ -30,10 +30,10 @@ import type {
 export const servicesData: NewService[] = [
   // ===== 1) خدمات الشعر واللحية =====
   {
-    nameAr: "قص شعر (فوطة سخنة وفوطة صاقعة)",
+    nameAr: "قص شعر (فوطة سخنة وفوطة ساقعه)",
     nameEn: "Haircut (Hot & Cold Towel)",
     descriptionAr:
-      "قص شعر احترافي يناسب شكل وجهك، مع فوطة سخنة قبل القص وفوطة صاقعة بعده.",
+      "قص شعر احترافي يناسب شكل وجهك، مع فوطة سخنة قبل القص وفوطة ساقعه بعده.",
     descriptionEn:
       "A professional haircut for your face shape, with a hot towel before and a cold towel after.",
     price: "250.00",
