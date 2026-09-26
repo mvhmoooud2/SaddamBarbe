@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { Menu, X, Scissors } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import { asset } from "@/lib/base-path";
 
 const navLinks = [
   { href: "#home", label: "الرئيسية" },
@@ -21,11 +23,15 @@ export default function Header() {
   return (
     <header className="fixed left-0 right-0 top-0 z-50 bg-[#0f0f0f]/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        <Link href="/" className="flex items-center gap-2">
-          <Scissors className="h-6 w-6 text-[#c9a227]" />
-          <span className="text-xl font-bold tracking-wider text-[#f5f0e6]">
-            SADDAM <span className="text-[#c9a227]">BARBER</span>
-          </span>
+        <Link href="/" className="flex shrink-0 items-center" aria-label="الصفحة الرئيسية">
+          <Image
+            src={asset("/images/IMG_6588.jpeg")}
+            alt="شعار صالون صدام للحلاقة"
+            width={225}
+            height={64}
+            className="h-10 w-auto object-contain"
+            priority
+          />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
