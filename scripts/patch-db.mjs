@@ -28,35 +28,17 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const sqlPath = join(__dirname, "patch-db.sql");
 const sql = readFileSync(sqlPath, "utf8");
 
-// تقسيم الملف لجُمل مفردة (مفيش دوال أو ; جوه نصوص هنا)
-const statements = sql
-  .split(";")
-  .map((s) =>
-    s
-      .split("\n")
-      .filter((line) => !line.trim().startsWith("--"))
-      .join("\n")
-      .trim()
-  )
-  .filter((s) => s.length > 0);
-
 const pool = new Pool({ connectionString: url });
 
-let ok = 0;
-let skipped = 0;
-
-for (const statement of statements) {
-  try {
-    await pool.query(statement);
-    ok++;
-  } catch (error) {
-    // مش بنوقف — بنكمّل باقي الجُمل
-    skipped++;
-    const firstLine = statement.split("\n")[0];
-    console.warn(`⚠️  تخطّي جملة (${error.code || "خطأ"}): ${firstLine}`);
-  }
+try {
+  // الملف كله عبارة عن بلوك DO $$ ... $$ واحد بيتخطّى الجداول الناقصة لوحده،
+  // فبننفّذه مرة واحدة (مينفعش نقسّمه على ; بسبب الـ ; اللي جوه البلوك).
+  await pool.query(sql);
+  console.log("\n✅ ترقيع قاعدة البيانات خلص بنجاح.");
+} catch (error) {
+  console.warn(`⚠️  ترقيع قاعدة البيانات فشل: ${error.message}`);
+} finally {
+  await pool.end();
 }
 
-await pool.end();
-console.log(`\n✅ ترقيع قاعدة البيانات خلص — نجح ${ok}، اتخطّى ${skipped}.`);
 process.exit(0);
