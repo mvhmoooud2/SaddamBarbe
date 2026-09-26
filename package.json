@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "seed": "tsx src/db/seed.ts",
+    "supabase:seed-sql": "node scripts/generate-supabase-seed.mjs",
     "images": "node scripts/generate-offer-images.mjs",
     "dev:up": "bash scripts/dev-up.sh"
   },

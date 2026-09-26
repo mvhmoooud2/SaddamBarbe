@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="1000" height="600" role="img" aria-label="عرض العريس VIP - السعر قبل العرض 5500 ج.م وبعد العرض 2900 ج.م بخصم 47%">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#232323"/>
+      <stop offset="0.55" stop-color="#151515"/>
+      <stop offset="1" stop-color="#0b0b0b"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e6c86e"/>
+      <stop offset="0.5" stop-color="#c9a227"/>
+      <stop offset="1" stop-color="#9c7f1c"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0" r="0.85">
+      <stop offset="0" stop-color="#c9a227" stop-opacity="0.20"/>
+      <stop offset="1" stop-color="#c9a227" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- الخلفية -->
+  <rect width="1000" height="600" fill="url(#bg)"/>
+  <rect width="1000" height="600" fill="url(#glow)"/>
+
+  <!-- خطوط خفيفة مائلة -->
+  <g stroke="#c9a227" stroke-opacity="0.05" stroke-width="2">
+    <line x1="-120" y1="640" x2="280" y2="-80"/>
+    <line x1="60" y1="660" x2="460" y2="-60"/>
+    <line x1="720" y1="660" x2="1120" y2="-60"/>
+  </g>
+
+  <!-- الإطار الذهبي -->
+  <rect x="24" y="24" width="952" height="552" rx="26" fill="none" stroke="#c9a227" stroke-opacity="0.4" stroke-width="2"/>
+  <rect x="34" y="34" width="932" height="532" rx="20" fill="none" stroke="#c9a227" stroke-opacity="0.14" stroke-width="1"/>
+
+  <!-- زخرفة الأركان -->
+  <g fill="url(#gold)">
+    <rect x="44" y="44" width="10" height="10" transform="rotate(45 49 49)"/>
+    <rect x="946" y="44" width="10" height="10" transform="rotate(45 951 49)"/>
+    <rect x="44" y="546" width="10" height="10" transform="rotate(45 49 551)"/>
+    <rect x="946" y="546" width="10" height="10" transform="rotate(45 951 551)"/>
+  </g>
+
+  <!-- شارة نسبة الخصم -->
+  <g>
+    <circle cx="882" cy="118" r="58" fill="url(#gold)"/>
+    <text x="882" y="104" text-anchor="middle" direction="rtl" font-family="'Segoe UI', Tahoma, 'Noto Sans Arabic', 'Geeza Pro', Arial, sans-serif" font-size="22" font-weight="700" fill="#1a1a1a">خصم</text>
+    <text x="882" y="150" text-anchor="middle" font-family="'Segoe UI', Tahoma, 'Noto Sans Arabic', 'Geeza Pro', Arial, sans-serif" font-size="38" font-weight="800" fill="#1a1a1a">47%</text>
+  </g>
+
+  <!-- عنوان فرعي -->
+  <g>
+    <line x1="418" y1="86" x2="474" y2="86" stroke="#c9a227" stroke-width="2"/>
+    <text x="500" y="94" text-anchor="middle" direction="rtl" font-family="'Segoe UI', Tahoma, 'Noto Sans Arabic', 'Geeza Pro', Arial, sans-serif" font-size="24" font-weight="600" fill="#c9a227" letter-spacing="2">عرض خاص</text>
+    <line x1="526" y1="86" x2="582" y2="86" stroke="#c9a227" stroke-width="2"/>
+  </g>
+
+  <!-- شارة العرض -->
+  <g>
+    <rect x="365" y="114" width="270" height="50" rx="25" fill="#c9a227" fill-opacity="0.14" stroke="#c9a227" stroke-opacity="0.45" stroke-width="1.5"/>
+    <text x="500" y="147" text-anchor="middle" direction="rtl" font-family="'Segoe UI', Tahoma, 'Noto Sans Arabic', 'Geeza Pro', Arial, sans-serif" font-size="25" font-weight="700" fill="#e6c86e">الباقة الملكية</text>
+  </g>
+
+  <!-- اسم العرض -->
+  <text x="500" y="248" text-anchor="middle" direction="rtl" font-family="'Segoe UI', Tahoma, 'Noto Sans Arabic', 'Geeza Pro', Arial, sans-serif" font-size="58" font-weight="800" fill="#f5f0e6">عرض العريس VIP</text>
+
+  <!-- فاصل -->
+  <line x1="440" y1="286" x2="560" y2="286" stroke="#c9a227" stroke-width="3"/>
+  <circle cx="500" cy="286" r="6" fill="#c9a227"/>
+
+  <!-- السعر قبل العرض -->
+  <text x="500" y="334" text-anchor="middle" direction="rtl" font-family="'Segoe UI', Tahoma, 'Noto Sans Arabic', 'Geeza Pro', Arial, sans-serif" font-size="24" font-weight="600" fill="#f5f0e6" fill-opacity="0.5">قبل العرض</text>
+  <text x="500" y="384" text-anchor="middle" direction="rtl" font-family="'Segoe UI', Tahoma, 'Noto Sans Arabic', 'Geeza Pro', Arial, sans-serif" font-size="46" font-weight="700" fill="#f5f0e6" fill-opacity="0.45">5500 ج.م</text>
+  <line x1="372" y1="370" x2="628" y2="370" stroke="#f5f0e6" stroke-opacity="0.45" stroke-width="3"/>
+
+  <!-- السعر بعد العرض -->
+  <text x="500" y="438" text-anchor="middle" direction="rtl" font-family="'Segoe UI', Tahoma, 'Noto Sans Arabic', 'Geeza Pro', Arial, sans-serif" font-size="24" font-weight="700" fill="#c9a227">بعد العرض</text>
+  <text x="500" y="514" text-anchor="middle" direction="rtl" font-family="'Segoe UI', Tahoma, 'Noto Sans Arabic', 'Geeza Pro', Arial, sans-serif" font-size="82" font-weight="800" fill="url(#gold)">2900 ج.م</text>
+
+  <!-- التوفير -->
+  <text x="500" y="556" text-anchor="middle" direction="rtl" font-family="'Segoe UI', Tahoma, 'Noto Sans Arabic', 'Geeza Pro', Arial, sans-serif" font-size="22" font-weight="600" fill="#f5f0e6" fill-opacity="0.55">وفّرت 2600 ج.م</text>
+
+  <!-- التذييل -->
+  <text x="500" y="586" text-anchor="middle" direction="rtl" font-family="'Segoe UI', Tahoma, 'Noto Sans Arabic', 'Geeza Pro', Arial, sans-serif" font-size="19" font-weight="600" fill="#c9a227" fill-opacity="0.75" letter-spacing="3">SADDAM BARBER · صالون صدام للحلاقة</text>
+</svg>

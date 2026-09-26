@@ -24,10 +24,23 @@ const globalForDb = globalThis as typeof globalThis & {
   __arenaNextJsPostgresqlPool?: Pool;
 };
 
+/**
+ * قواعد البيانات السحابية (Supabase مثلاً) بتحتاج SSL.
+ * لو الرابط مش محلي بنفعّل SSL تلقائياً (Supabase بيستخدم شهادة مش موجودة
+ * في مخزن الشهادات بتاع Node، فبنقبلها من غير تحقق زي ما هو موصى به عندهم).
+ */
+function sslConfig(url?: string) {
+  if (!url) return undefined;
+  if (/localhost|127\.0\.0\.1/.test(url)) return undefined;
+  if (/sslmode=disable/.test(url)) return undefined;
+  return { rejectUnauthorized: false };
+}
+
 export const pool =
   globalForDb.__arenaNextJsPostgresqlPool ??
   new Pool({
     connectionString: databaseUrl,
+    ssl: sslConfig(databaseUrl),
   });
 
 if (process.env.NODE_ENV !== "production") {
