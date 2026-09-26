@@ -86,7 +86,7 @@ export const servicesData: NewService[] = [
     isActive: true,
   },
   {
-    nameAr: "شوار",
+    nameAr: "سشوار",
     nameEn: "Blow Dry",
     descriptionAr: "تسريح وتجفيف الشعر بالسيشوار بلمسة نهائية مرتبة.",
     descriptionEn: "Hair drying and styling with a neat finishing touch.",
