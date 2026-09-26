@@ -20,6 +20,14 @@ function formatPrice(price: string | number) {
   return Number(price).toFixed(0);
 }
 
+const serviceImageOverrides: Record<string, string[]> = {
+  سشوار: [
+    "/images/service-blow-dry-1.jpeg",
+    "/images/service-blow-dry-2.jpeg",
+  ],
+  توبيك: ["/images/service-toppik.jpeg"],
+};
+
 export default function Services({ services }: ServicesProps) {
   const [selectedBranchId, setSelectedBranchId] = useState(branches[0]?.id ?? "");
 
@@ -142,20 +150,37 @@ export default function Services({ services }: ServicesProps) {
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {categoryServices.map((service) => {
                   const isPerGram = /لكل جرام/.test(service.nameAr);
+                  const serviceImages =
+                    serviceImageOverrides[service.displayNameAr] ?? [
+                      service.imageUrl || "/images/hero.jpg",
+                    ];
+                  const hasMultipleImages = serviceImages.length > 1;
+
                   return (
                     <article
                       key={service.id}
                       className="group overflow-hidden rounded-2xl border border-[#c9a227]/10 bg-[#1a1a1a] transition-transform hover:-translate-y-1 hover:border-[#c9a227]/40"
                     >
-                      <div className="relative h-48 overflow-hidden">
-                        <Image
-                          src={asset(service.imageUrl || "/images/hero.jpg")}
-                          alt={service.displayNameAr}
-                          fill
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f]/85 to-transparent" />
+                      <div
+                        className={`relative h-48 overflow-hidden ${
+                          hasMultipleImages ? "grid grid-cols-2 gap-0.5 bg-[#0f0f0f]" : ""
+                        }`}
+                      >
+                        {serviceImages.map((imagePath, imageIndex) => (
+                          <div
+                            key={imagePath}
+                            className={hasMultipleImages ? "relative min-h-0" : "absolute inset-0"}
+                          >
+                            <Image
+                              src={asset(imagePath)}
+                              alt={`${service.displayNameAr} ${imageIndex + 1}`}
+                              fill
+                              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
+                              className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
+                          </div>
+                        ))}
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0f0f0f]/85 to-transparent" />
                         <div className="absolute bottom-4 start-4 rounded-full bg-[#c9a227] px-3 py-1 text-sm font-bold text-[#0f0f0f]">
                           {formatPrice(service.price)} ج.م
                           {isPerGram ? " / جرام" : ""}

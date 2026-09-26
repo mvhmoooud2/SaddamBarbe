@@ -91,7 +91,7 @@ export const servicesData: NewService[] = [
     descriptionEn: "Hair drying and styling with a neat finishing touch.",
     price: "150.00",
     durationMinutes: 20,
-    imageUrl: "/images/gallery-6.jpg",
+    imageUrl: "/images/service-blow-dry-2.jpeg",
     isActive: true,
   },
 
@@ -164,7 +164,7 @@ export const servicesData: NewService[] = [
       "Modern colors with high quality, long-lasting hold and safe products.",
     price: "300.00",
     durationMinutes: 90,
-    imageUrl: "/images/service-coloring.jpg",
+    imageUrl: "/images/service-coloring-saddam.jpeg",
     isActive: true,
   },
   {
@@ -176,7 +176,7 @@ export const servicesData: NewService[] = [
       "Covering thin patches with toppik powder in a shade that matches your hair.",
     price: "150.00",
     durationMinutes: 30,
-    imageUrl: "/images/service-coloring.jpg",
+    imageUrl: "/images/service-toppik.jpeg",
     isActive: true,
   },
 
