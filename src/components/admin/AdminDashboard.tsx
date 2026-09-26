@@ -1,12 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ExternalLink, LogOut, Settings2 } from "lucide-react";
+import { Database, ExternalLink, LogOut, Settings2 } from "lucide-react";
 import { adminResources } from "@/data/admin-fields";
 import ResourceManager from "./ResourceManager";
 import SettingsManager from "./SettingsManager";
+import DatabaseViewer from "./DatabaseViewer";
 
 const SETTINGS_TAB = "settings";
+const DATABASE_TAB = "database";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState(adminResources[0].key);
@@ -99,11 +101,24 @@ export default function AdminDashboard() {
             <Settings2 className="h-4 w-4" />
             إعدادات الموقع
           </button>
+          <button
+            onClick={() => setActiveTab(DATABASE_TAB)}
+            className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-bold transition-colors ${
+              activeTab === DATABASE_TAB
+                ? "bg-[#c9a227] text-[#0f0f0f]"
+                : "border border-[#c9a227]/25 text-[#f5f0e6]/70 hover:text-[#c9a227]"
+            }`}
+          >
+            <Database className="h-4 w-4" />
+            قاعدة البيانات
+          </button>
         </nav>
       </header>
 
       <main className="mx-auto max-w-7xl px-5 py-6">
-        {activeTab === SETTINGS_TAB ? (
+        {activeTab === DATABASE_TAB ? (
+          <DatabaseViewer />
+        ) : activeTab === SETTINGS_TAB ? (
           <SettingsManager />
         ) : resource ? (
           <ResourceManager
