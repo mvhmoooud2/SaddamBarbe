@@ -14,20 +14,26 @@ import {
 } from "lucide-react";
 import type { Service, Offer } from "@/db/schema";
 import { basePath } from "@/lib/base-path";
-import { siteConfig, whatsappLinkTo } from "@/data/site-config";
-import { branches, branchWhatsappLinkWithMessage } from "@/data/branches";
+import {
+  branches as staticBranches,
+  branchWhatsappLinkWithMessage,
+  type Branch,
+} from "@/data/branches";
+import { setting, type SiteSettingsMap } from "@/lib/site-settings";
 import { getBranchServiceOptions } from "@/data/branch-services";
 import { BOOK_SERVICE_EVENT } from "@/components/BookServiceButton";
 
 interface BookingFormProps {
   services: Service[];
   offers: Offer[];
+  branches?: Branch[];
+  settings?: SiteSettingsMap;
 }
 
 /** قيمة خيار العرض في قائمة الحجز (مميزة عن معرّفات الخدمات) */
 const offerValue = (id: number) => `offer-${id}`;
 
-const emptyForm = (services: Service[]) => {
+const emptyForm = (services: Service[], branches: Branch[]) => {
   const branchId = branches.length > 0 ? branches[0].id : "";
   const branchServices = getBranchServiceOptions(branchId, services);
 
@@ -49,8 +55,13 @@ function localToday() {
   return local.toISOString().split("T")[0];
 }
 
-export default function BookingForm({ services, offers }: BookingFormProps) {
-  const [formData, setFormData] = useState(() => emptyForm(services));
+export default function BookingForm({
+  services,
+  offers,
+  branches = staticBranches,
+  settings,
+}: BookingFormProps) {
+  const [formData, setFormData] = useState(() => emptyForm(services, branches));
   const [isSubmitting, setIsSubmitting] = useState(false);
   // بنحددها بعد التحميل علشان مايحصلش اختلاف بين السيرفر والمتصفح (hydration)
   const [minDate, setMinDate] = useState("");
@@ -136,7 +147,7 @@ export default function BookingForm({ services, offers }: BookingFormProps) {
     const branch = selectedBranch();
 
     return [
-      `طلب حجز جديد من موقع ${siteConfig.nameAr}`,
+      `طلب حجز جديد من موقع ${setting(settings, "siteNameAr")}`,
       `الاسم: ${formData.customerName}`,
       `الموبايل: ${formData.customerPhone}`,
       branch ? `الفرع: ${branch.nameAr}` : "",
@@ -156,9 +167,8 @@ export default function BookingForm({ services, offers }: BookingFormProps) {
    */
   const bookingWhatsappLink = (text: string) => {
     const branch = selectedBranch();
-    return branch
-      ? branchWhatsappLinkWithMessage(branch, text)
-      : whatsappLinkTo(siteConfig.whatsapp, text);
+    if (branch) return branchWhatsappLinkWithMessage(branch, text);
+    return `https://wa.me/${setting(settings, "whatsapp")}?text=${encodeURIComponent(text)}`;
   };
 
   /** هل العميل اختار عرض من قائمة «العروض»؟ */
@@ -222,7 +232,7 @@ export default function BookingForm({ services, offers }: BookingFormProps) {
           type: "success",
           text: "تم حجز موعدك بنجاح! سنتواصل معك قريباً للتأكيد.",
         });
-        setFormData(emptyForm(services));
+        setFormData(emptyForm(services, branches));
         return;
       }
 
@@ -255,13 +265,13 @@ export default function BookingForm({ services, offers }: BookingFormProps) {
       <div className="mx-auto max-w-4xl px-6">
         <div className="mb-12 text-center">
           <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-[#c9a227]">
-            احجز موعدك
+            {setting(settings, "bookingKicker")}
           </p>
           <h2 className="text-3xl font-bold text-[#f5f0e6] md:text-4xl">
-            حجز موعد سريع
+            {setting(settings, "bookingTitle")}
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-[#f5f0e6]/70">
-            اختر الخدمة والوقت المناسب لك، وسنقوم بالتواصل معك لتأكيد الحجز.
+            {setting(settings, "bookingSubtitle")}
           </p>
         </div>
 

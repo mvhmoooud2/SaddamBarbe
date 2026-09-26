@@ -4,42 +4,27 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronRight, ChevronLeft, Pause, Play } from "lucide-react";
 import { asset } from "@/lib/base-path";
+import { setting, type SiteSettingsMap } from "@/lib/site-settings";
+import { galleryData, type GalleryItem } from "@/data/gallery";
 
 /**
  * صور المعرض.
  * الصور مقاساتها مختلفة (أفقية ورأسية)، فالسلايدر بيعرضها كاملة (object-contain)
  * فوق نسخة مموّهة من نفس الصورة علشان الشكل يبقى موحّد من غير ما نقص أي جزء منها.
  */
-const galleryImages = [
-  {
-    src: "/images/gallery-1.jpg",
-    alt: "جلسة عناية بالذقن مع بخار الوجه وترطيب بالزيت",
-  },
-  {
-    src: "/images/gallery-2.jpg",
-    alt: "تنظيف وتشكيل الأظافر (مانيكير) بعناية في الصالون",
-  },
-  {
-    src: "/images/gallery-3.jpg",
-    alt: "تنظيف عميق للبشرة بالبخار مع تقشير الوجه",
-  },
-  {
-    src: "/images/gallery-4.jpg",
-    alt: "وضع ماسك الوجه بفرشاة احترافية داخل غرفة العناية",
-  },
-  {
-    src: "/images/gallery-5.jpg",
-    alt: "تغذية البشرة بالبخار مع سيروم مرطّب للوجه",
-  },
-  {
-    src: "/images/gallery-6.jpg",
-    alt: "دهان زيت العناية بالبشرة بعد جلسة التنظيف",
-  },
-];
 
 const AUTOPLAY_MS = 5000;
 
-export default function GallerySlider() {
+type GallerySliderProps = {
+  images?: GalleryItem[];
+  settings?: SiteSettingsMap;
+};
+
+export default function GallerySlider({
+  images,
+  settings,
+}: GallerySliderProps) {
+  const galleryImages = images && images.length > 0 ? images : galleryData;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [hasFocus, setHasFocus] = useState(false);
@@ -108,10 +93,10 @@ export default function GallerySlider() {
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-8 text-center">
           <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-[#c9a227]">
-            من داخل الصالون
+            {setting(settings, "galleryKicker")}
           </p>
           <h2 className="text-3xl font-bold text-[#f5f0e6] md:text-4xl">
-            معرض الصور
+            {setting(settings, "galleryTitle")}
           </h2>
         </div>
 

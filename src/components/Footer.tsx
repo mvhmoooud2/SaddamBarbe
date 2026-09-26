@@ -1,8 +1,12 @@
 import Image from "next/image";
 import { Phone, MapPin, Clock, MessageCircle } from "lucide-react";
-import { siteConfig, whatsappLink } from "@/data/site-config";
-import { branches } from "@/data/branches";
+import { branches as staticBranches, type Branch } from "@/data/branches";
 import { asset } from "@/lib/base-path";
+import {
+  setting,
+  whatsappLinkFromSettings,
+  type SiteSettingsMap,
+} from "@/lib/site-settings";
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -44,7 +48,17 @@ function FacebookIcon({ className }: { className?: string }) {
   );
 }
 
-export default function Footer() {
+type FooterProps = {
+  branches?: Branch[];
+  settings?: SiteSettingsMap;
+};
+
+export default function Footer({
+  branches = staticBranches,
+  settings,
+}: FooterProps) {
+  const tiktok = setting(settings, "tiktok");
+
   return (
     <footer id="contact" className="border-t border-[#c9a227]/20 bg-[#0f0f0f] pt-16">
       <div className="mx-auto max-w-7xl px-6">
@@ -52,16 +66,15 @@ export default function Footer() {
           <div>
             <div className="flex items-center">
               <Image
-                src={asset("/images/IMG_6588.jpeg")}
-                alt="شعار صالون صدام للحلاقة"
+                src={asset(setting(settings, "logoImage"))}
+                alt={`شعار ${setting(settings, "siteNameAr")}`}
                 width={225}
                 height={64}
                 className="h-12 w-auto object-contain"
               />
             </div>
             <p className="mt-4 text-sm leading-relaxed text-[#f5f0e6]/70">
-              {siteConfig.nameAr} يقدم تجربة حلاقة فاخرة بأيدي محترفين. نحرص على
-              كل تفصيل لنمنحك المظهر الأنيق الذي تستحقه.
+              {setting(settings, "footerAbout")}
             </p>
           </div>
 
@@ -98,7 +111,7 @@ export default function Footer() {
               <li className="flex items-center gap-3">
                 <MessageCircle className="h-4 w-4 shrink-0 text-[#c9a227]" />
                 <a
-                  href={whatsappLink("السلام عليكم، عايز أحجز موعد في صالون صدام")}
+                  href={whatsappLinkFromSettings(settings)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="transition-colors hover:text-[#c9a227]"
@@ -113,7 +126,7 @@ export default function Footer() {
             <h3 className="mb-4 text-lg font-bold text-[#c9a227]">تابعنا</h3>
             <div className="flex gap-4">
               <a
-                href={siteConfig.instagram}
+                href={setting(settings, "instagram")}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-[#c9a227]/30 text-[#c9a227] transition-colors hover:bg-[#c9a227] hover:text-[#0f0f0f]"
@@ -122,7 +135,7 @@ export default function Footer() {
                 <InstagramIcon />
               </a>
               <a
-                href={siteConfig.facebook}
+                href={setting(settings, "facebook")}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-[#c9a227]/30 text-[#c9a227] transition-colors hover:bg-[#c9a227] hover:text-[#0f0f0f]"
@@ -130,12 +143,23 @@ export default function Footer() {
               >
                 <FacebookIcon />
               </a>
+              {tiktok && (
+                <a
+                  href={tiktok}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-[#c9a227]/30 text-xs font-black text-[#c9a227] transition-colors hover:bg-[#c9a227] hover:text-[#0f0f0f]"
+                  aria-label="TikTok"
+                >
+                  TT
+                </a>
+              )}
             </div>
           </div>
         </div>
 
         <div className="mt-12 border-t border-[#c9a227]/10 py-6 text-center text-sm text-[#f5f0e6]/50">
-          © {new Date().getFullYear()} {siteConfig.nameEn}. جميع الحقوق محفوظة.
+          © {new Date().getFullYear()} {setting(settings, "siteNameEn")}. جميع الحقوق محفوظة.
         </div>
       </div>
     </footer>

@@ -1,8 +1,5 @@
 import { connection } from "next/server";
-import { db } from "@/db";
-import { services, offers } from "@/db/schema";
-import { eq } from "drizzle-orm";
-import { fallbackServices, fallbackOffers } from "@/data/fallback";
+import { loadSiteContent, staticContent } from "@/lib/content";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Services from "@/components/Services";
@@ -14,57 +11,42 @@ import Testimonials from "@/components/Testimonials";
 import Footer from "@/components/Footer";
 import FixedWhatsappButton from "@/components/FixedWhatsappButton";
 
-// في نسخة GitHub Pages بنتخطى قاعدة البيانات ونستخدم البيانات الثابتة.
-// في التشغيل العادي الصفحة بتقرأ أحدث الخدمات والعروض، ولو قاعدة البيانات
-// غير متاحة بنرجع تلقائياً للداتا الاحتياطية علشان الموقع يفضل شغال.
-async function loadSiteData() {
-  if (process.env.STATIC_EXPORT === "1") {
-    return { servicesData: fallbackServices, offersData: fallbackOffers };
-  }
-
+// كل محتوى الصفحة (الخدمات، العروض، الفروع، الصور، النصوص، أرقام التواصل)
+// بيتحمّل من قاعدة البيانات علشان يتعدّل من لوحة التحكم /admin.
+// في نسخة GitHub Pages أو لو الداتابيز مش متاحة بنستخدم البيانات الثابتة.
+async function getContent() {
+  if (process.env.STATIC_EXPORT === "1") return staticContent();
   await connection();
-
-  try {
-    const [servicesData, offersData] = await Promise.all([
-      db
-        .select()
-        .from(services)
-        .where(eq(services.isActive, true))
-        .orderBy(services.id),
-      db
-        .select()
-        .from(offers)
-        .where(eq(offers.isActive, true))
-        .orderBy(offers.id),
-    ]);
-
-    return { servicesData, offersData };
-  } catch (error) {
-    console.warn(
-      "[fallback] قاعدة البيانات غير متاحة، يتم استخدام البيانات الثابتة:",
-      error,
-    );
-    return { servicesData: fallbackServices, offersData: fallbackOffers };
-  }
+  return loadSiteContent();
 }
 
 export default async function HomePage() {
-  const { servicesData, offersData } = await loadSiteData();
+  const content = await getContent();
+  const { services, offers, branches, gallery, testimonials, settings } = content;
 
   return (
     <>
-      <Header />
+      <Header settings={settings} />
       <main>
-        <Hero />
-        <Services services={servicesData} />
-        <Offers offers={offersData} />
-        <GallerySlider />
-        <Branches />
-        <BookingForm services={servicesData} offers={offersData} />
-        <Testimonials />
+        <Hero settings={settings} />
+        <Services services={services} branches={branches} settings={settings} />
+        <Offers offers={offers} branches={branches} settings={settings} />
+        <GallerySlider images={gallery} settings={settings} />
+        <Branches branches={branches} settings={settings} />
+        <BookingForm
+          services={services}
+          offers={offers}
+          branches={branches}
+          settings={settings}
+        />
+        <Testimonials
+          branches={branches}
+          testimonials={testimonials}
+          settings={settings}
+        />
       </main>
-      <Footer />
-      <FixedWhatsappButton />
+      <Footer branches={branches} settings={settings} />
+      <FixedWhatsappButton settings={settings} />
     </>
   );
 }

@@ -1,22 +1,65 @@
-import { ExternalLink, MapPin, Star } from "lucide-react";
-import { branches } from "@/data/branches";
+import { ExternalLink, MapPin, Quote, Star } from "lucide-react";
+import { branches as staticBranches, type Branch } from "@/data/branches";
+import type { Testimonial } from "@/db/schema";
+import { setting, type SiteSettingsMap } from "@/lib/site-settings";
 
-export default function Testimonials() {
+type TestimonialsProps = {
+  branches?: Branch[];
+  /** آراء العملاء المضافة من لوحة التحكم (لو فاضية بنعرض تقييمات جوجل بس) */
+  testimonials?: Testimonial[];
+  settings?: SiteSettingsMap;
+};
+
+export default function Testimonials({
+  branches = staticBranches,
+  testimonials = [],
+  settings,
+}: TestimonialsProps) {
   return (
     <section id="testimonials" className="section-padding bg-[#0f0f0f]">
       <div className="mx-auto max-w-5xl px-6">
         <div className="mb-12 text-center">
           <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-[#c9a227]">
-            تقييمات حقيقية
+            {setting(settings, "testimonialsKicker")}
           </p>
           <h2 className="text-3xl font-bold text-[#f5f0e6] md:text-4xl">
-            شوف تقييماتنا على Google
+            {setting(settings, "testimonialsTitle")}
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-[#f5f0e6]/70">
-            بدل ما نعرض كلام منسوب لعملاء من غير مصدر، تقدر تشوف التقييمات
-            الحقيقية وتفاصيل كل فرع مباشرة على خرائط Google.
+            {setting(settings, "testimonialsSubtitle")}
           </p>
         </div>
+
+        {testimonials.length > 0 && (
+          <div className="mb-12 grid gap-6 md:grid-cols-2">
+            {testimonials.map((testimonial) => (
+              <article
+                key={testimonial.id}
+                className="rounded-2xl border border-[#c9a227]/20 bg-[#1a1a1a] p-6"
+              >
+                <Quote className="mb-3 h-6 w-6 text-[#c9a227]" />
+                <p className="mb-4 leading-relaxed text-[#f5f0e6]/80">
+                  {testimonial.commentAr}
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#f5f0e6]">
+                    {testimonial.customerName}
+                  </span>
+                  <span className="flex items-center gap-0.5 text-[#c9a227]">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <Star
+                        key={index}
+                        className={`h-4 w-4 ${
+                          index < testimonial.rating ? "fill-[#c9a227]" : "opacity-30"
+                        }`}
+                      />
+                    ))}
+                  </span>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
 
         <div className="grid gap-6 md:grid-cols-2">
           {branches.map((branch) => (

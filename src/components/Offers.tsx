@@ -6,12 +6,16 @@ import { BadgePercent, Check, Clock, Crown, MessageCircle, Tag, X } from "lucide
 import type { Offer } from "@/db/schema";
 import { asset } from "@/lib/base-path";
 import {
-  branches,
+  branches as staticBranches,
   branchWhatsappLinkWithMessage,
+  type Branch,
 } from "@/data/branches";
+import { setting, type SiteSettingsMap } from "@/lib/site-settings";
 
 interface OffersProps {
   offers: Offer[];
+  branches?: Branch[];
+  settings?: SiteSettingsMap;
 }
 
 function formatPrice(price: string | number) {
@@ -63,15 +67,22 @@ function formatValidUntil(date: Date | null) {
   }
 }
 
-function offerWhatsappLink(offer: Offer) {
-  const nasrCity = branches.find((branch) => branch.id === "nasr-city") ?? branches[0];
+function offerWhatsappLink(offer: Offer, branches: Branch[]) {
+  const offersBranch =
+    branches.find((branch) => branch.id === "nasr-city") ?? branches[0];
   const message = `السلام عليكم، عايز أحجز ${offerTitle(offer.titleAr)} بسعر ${formatPrice(
     offer.newPrice,
-  )} جنيه في فرع مدينة نصر – عباس العقاد.`;
-  return nasrCity ? branchWhatsappLinkWithMessage(nasrCity, message) : "#booking";
+  )} جنيه${offersBranch ? ` في ${offersBranch.nameAr}` : ""}.`;
+  return offersBranch
+    ? branchWhatsappLinkWithMessage(offersBranch, message)
+    : "#booking";
 }
 
-export default function Offers({ offers }: OffersProps) {
+export default function Offers({
+  offers,
+  branches = staticBranches,
+  settings,
+}: OffersProps) {
   const [activeOffer, setActiveOffer] = useState<Offer | null>(null);
 
   const closeModal = useCallback(() => setActiveOffer(null), []);
@@ -106,14 +117,13 @@ export default function Offers({ offers }: OffersProps) {
         <div className="mb-12 text-center">
           <p className="mb-3 flex items-center justify-center gap-2 text-sm font-medium uppercase tracking-[0.2em] text-[#c9a227]">
             <Tag className="h-4 w-4" />
-            عروض خاصة
+            {setting(settings, "offersKicker")}
           </p>
           <h2 className="text-3xl font-bold text-[#f5f0e6] md:text-4xl">
-            عروض العرسان وتجارب VIP
+            {setting(settings, "offersTitle")}
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-[#f5f0e6]/70">
-            كل عرض واضح بسعره القديم والجديد وخدماته بالتفصيل. العروض متاحة في
-            فرع مدينة نصر – عباس العقاد، واحجزها مباشرة على واتساب.
+            {setting(settings, "offersSubtitle")}
           </p>
         </div>
 
@@ -282,7 +292,7 @@ export default function Offers({ offers }: OffersProps) {
               )}
 
               <a
-                href={offerWhatsappLink(activeOffer)}
+                href={offerWhatsappLink(activeOffer, branches)}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={closeModal}

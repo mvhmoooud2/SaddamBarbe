@@ -1,10 +1,15 @@
 import { MessageCircle } from "lucide-react";
-import { whatsappLink } from "@/data/site-config";
+import {
+  whatsappLinkFromSettings,
+  type SiteSettingsMap,
+} from "@/lib/site-settings";
 
-export default function FixedWhatsappButton() {
-  const link = whatsappLink(
-    "السلام عليكم، عايز أحجز موعد في صالون صدام",
-  );
+export default function FixedWhatsappButton({
+  settings,
+}: {
+  settings?: SiteSettingsMap;
+}) {
+  const link = whatsappLinkFromSettings(settings);
 
   return (
     <a
