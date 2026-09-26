@@ -23,9 +23,9 @@ services:
     plan: free
     region: frankfurt
     # بناء الموقع + إنشاء جداول قاعدة البيانات
-    buildCommand: npm ci && npm run db:push && npm run build
+    buildCommand: npm ci && npm run deploy:db && npm run build
     # زرع البيانات الافتراضية أول مرة بس، وبعدين تشغيل الموقع
-    startCommand: npm run db:init && npm start
+    startCommand: npm start
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:
