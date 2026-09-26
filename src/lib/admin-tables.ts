@@ -72,6 +72,32 @@ export function getTable(resourceKey: string) {
   return tables[resourceKey];
 }
 
+/**
+ * بيطلّع السبب الحقيقي للخطأ من جوه أخطاء Drizzle/pg.
+ *
+ * Drizzle بيلفّ خطأ الداتابيز الأصلي في رسالة عامة زي:
+ *   "Failed query: update ... params: ..."
+ * والسبب الفعلي (زي: column "x" does not exist) بيبقى جوه error.cause.
+ * الدالة دي بتفكّ السلسلة وترجّع أعمق رسالة مفيدة.
+ */
+export function describeDbError(error: unknown): string {
+  const messages: string[] = [];
+  let current: any = error;
+  const seen = new Set<unknown>();
+  while (current && typeof current === "object" && !seen.has(current)) {
+    seen.add(current);
+    const detail = current.detail || current.hint;
+    const message = current.message;
+    if (message && !String(message).startsWith("Failed query")) {
+      messages.push(String(message));
+    }
+    if (detail) messages.push(String(detail));
+    current = current.cause;
+  }
+  // أعمق رسالة (سبب pg الحقيقي) هي الأهم
+  return messages.length ? messages[messages.length - 1] : "خطأ غير معروف في قاعدة البيانات";
+}
+
 /** تحويل المفاتيح من camelCase إلى snake_case */
 export function camelToSnake(str: string): string {
   return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);

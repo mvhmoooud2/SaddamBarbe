@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/admin-auth";
 import { getResource } from "@/data/admin-fields";
-import { deleteRow, getTable, sanitizeBody, updateRow } from "@/lib/admin-tables";
+import { deleteRow, describeDbError, getTable, sanitizeBody, updateRow } from "@/lib/admin-tables";
 
 export const dynamic = "force-dynamic";
 
@@ -50,9 +50,10 @@ export async function PATCH(request: Request, { params }: Params) {
     }
     return NextResponse.json(row);
   } catch (error: any) {
-    console.error(`[admin] فشل تعديل ${resource}:`, error);
+    const reason = describeDbError(error);
+    console.error(`[admin] فشل تعديل ${resource}:`, reason, error);
     return NextResponse.json(
-      { error: error?.message || "مش قادرين نحفظ التعديل دلوقتي" },
+      { error: `مش قادرين نحفظ التعديل: ${reason}` },
       { status: 503 }
     );
   }
