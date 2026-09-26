@@ -35,6 +35,12 @@ export type Branch = {
   /** إحداثيات الفرع — مركز الخريطة ولينك الاتجاهات */
   lat: number;
   lng: number;
+  /**
+   * صورة قائمة أسعار الفرع (اختياري) — مسار من جذر public
+   * مثال: "/images/prices-nasr-city.jpg"
+   * بتتعرض جوه كارت الفرع في قسم «فروعنا» في بلوك «قائمة الأسعار».
+   */
+  priceListImage?: string;
   /** تقييم الفرع على خرائط جوجل (اختياري) */
   googleRating?: number;
   /** عدد التقييمات على خرائط جوجل (اختياري) */
@@ -70,6 +76,7 @@ export const branches: Branch[] = [
     phoneHref: "tel:+201121537537",
     whatsapp: "201121537537",
     hoursAr: "يومياً من 11:00 صباحاً حتى 2:30 صباحاً",
+    priceListImage: "/images/prices-nasr-city.jpg",
     lat: 30.0633343,
     lng: 31.3366492,
     googleRating: 5,

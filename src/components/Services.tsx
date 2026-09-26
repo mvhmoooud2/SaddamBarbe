@@ -1,7 +1,8 @@
 import Image from "next/image";
-import { Clock, Scissors } from "lucide-react";
+import { Clock, Info, Scissors } from "lucide-react";
 import type { Service } from "@/db/schema";
 import { asset } from "@/lib/base-path";
+import { primaryBranch } from "@/data/branches";
 
 interface ServicesProps {
   services: Service[];
@@ -20,7 +21,7 @@ export default function Services({ services }: ServicesProps) {
             ما نقدمه
           </p>
           <h2 className="text-3xl font-bold text-[#f5f0e6] md:text-4xl">
-            خدماتنا المميزة
+            خدماتنا وأسعارنا
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-[#f5f0e6]/70">
             نقدم باقة متكاملة من خدمات العناية بالرجل بأعلى معايير الجودة والاحترافية.
@@ -64,6 +65,23 @@ export default function Services({ services }: ServicesProps) {
             </div>
           ))}
         </div>
+
+        {/* ملاحظة الأسعار: القائمة المعروضة هي قائمة فرع مدينة نصر،
+            وأسعار فرع حدائق القبة ممكن تختلف — ورقم الفرع قابل للاتصال مباشرة */}
+        <p className="mx-auto mt-12 flex max-w-4xl flex-col items-center gap-3 rounded-2xl border border-[#c9a227]/25 bg-[#1a1a1a] px-6 py-5 text-center text-sm leading-relaxed text-[#f5f0e6]/80 sm:flex-row sm:items-start sm:text-start">
+          <Info className="mt-0.5 h-5 w-5 shrink-0 text-[#c9a227]" />
+          <span>
+            الأسعار المعروضة هي أسعار فرع مدينة نصر. أسعار فرع حدائق القبة ممكن
+            تختلف — للاستفسار والحجز كلمنا على{" "}
+            <a
+              href={primaryBranch.phoneHref}
+              dir="ltr"
+              className="inline-block font-semibold tracking-wide whitespace-nowrap text-[#c9a227] transition-colors hover:text-[#f5f0e6]"
+            >
+              {primaryBranch.phoneDisplay}
+            </a>
+          </span>
+        </p>
       </div>
     </section>
   );
