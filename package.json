@@ -14,6 +14,7 @@
     "dev:up": "bash scripts/dev-up.sh",
     "db:init": "tsx src/db/init.ts",
     "db:push": "drizzle-kit push --force",
+    "db:patch": "node scripts/patch-db.mjs",
     "vercel-build": "node scripts/deploy-db.mjs && next build",
     "deploy:db": "node scripts/deploy-db.mjs"
   },

@@ -30,4 +30,8 @@ function run(label, command) {
 }
 
 run("إنشاء/تحديث جداول قاعدة البيانات", "npx drizzle-kit push --force");
+// ترقيع الأعمدة الناقصة على قواعد البيانات القديمة (آمن ويتكرر) —
+// بيضمن إن أعمدة زي display_name_ar / category_ar / branch_slugs / is_featured
+// تبقى موجودة حتى لو الـ push فوق فشل أو ماشتغلش صح.
+run("ترقيع الأعمدة الناقصة (Idempotent)", "node scripts/patch-db.mjs");
 run("زرع البيانات الافتراضية (أول مرة بس)", "npx tsx src/db/init.ts");
