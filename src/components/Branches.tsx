@@ -1,11 +1,14 @@
+import Image from "next/image";
 import {
   Clock,
   MapPin,
   MessageCircle,
   Navigation,
   Phone,
+  ReceiptText,
   Star,
   Store,
+  ZoomIn,
 } from "lucide-react";
 import {
   branches,
@@ -14,6 +17,7 @@ import {
   mapEmbedUrl,
 } from "@/data/branches";
 import { siteConfig } from "@/data/site-config";
+import { asset } from "@/lib/base-path";
 
 /**
  * قسم «فروعنا»: كارت لكل فرع فيه الخريطة + العنوان + المواعيد + رقم التليفون
@@ -22,6 +26,10 @@ import { siteConfig } from "@/data/site-config";
  * كل البيانات بتيجي من src/data/branches.ts — التعديل بيتعمل هناك بس.
  * الخريطة iframe من خرائط جوجل (output=embed) فمن غير أي API key،
  * وبتشتغل تمام في النسخة الثابتة على GitHub Pages.
+ *
+ * ولو الفرع عنده صورة قائمة أسعار (priceListImage) بتتعرض في بلوك
+ * «قائمة الأسعار» تحت الخريطة — الصورة بتتحمّل بـ asset() علشان مسار
+ * GitHub Pages (/SaddamBarbe) يبقى صح.
  */
 export default function Branches() {
   if (branches.length === 0) return null;
@@ -131,6 +139,48 @@ export default function Branches() {
                     <span className="leading-relaxed">{branch.hoursAr}</span>
                   </li>
                 </ul>
+
+                {/* قائمة أسعار الفرع — بتظهر بس للفروع اللي فيها priceListImage */}
+                {branch.priceListImage && (
+                  <div className="rounded-2xl border border-[#c9a227]/20 bg-[#0f0f0f]/70 p-4 md:p-5">
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                      <h4 className="flex items-center gap-2 text-sm font-bold text-[#c9a227]">
+                        <ReceiptText className="h-4 w-4" />
+                        قائمة الأسعار
+                      </h4>
+                      <a
+                        href={asset(branch.priceListImage)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#f5f0e6]/60 transition-colors hover:text-[#c9a227]"
+                      >
+                        <ZoomIn className="h-3.5 w-3.5" />
+                        اضغط للتكبير
+                      </a>
+                    </div>
+                    <a
+                      href={asset(branch.priceListImage)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
+                      aria-label={`قائمة أسعار ${branch.nameAr} بالحجم الكامل`}
+                    >
+                      <div className="relative h-[420px] w-full overflow-hidden rounded-xl bg-[#0f0f0f] md:h-[480px]">
+                        <Image
+                          src={asset(branch.priceListImage)}
+                          alt={`قائمة أسعار ${branch.nameAr}`}
+                          fill
+                          sizes="(max-width: 1024px) 100vw, 50vw"
+                          className="object-contain"
+                        />
+                      </div>
+                    </a>
+                    <p className="mt-3 text-center text-xs text-[#f5f0e6]/50">
+                      الأسعار دي خاصة بـ{branch.nameAr} — لسه فيها تحديث؟ كلمنا
+                      وهنأكد عليك السعر قبل الحجز.
+                    </p>
+                  </div>
+                )}
 
                 <div className="mt-auto grid gap-3 sm:grid-cols-2">
                   <a
