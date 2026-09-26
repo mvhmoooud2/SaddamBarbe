@@ -108,7 +108,7 @@ export default function Offers({ offers }: OffersProps) {
               <button
                 type="button"
                 onClick={() => setActiveOffer(offer)}
-                className="relative block aspect-[5/3] w-full overflow-hidden text-right"
+                className="relative block aspect-[4/5] w-full overflow-hidden text-right"
                 aria-label={`عرض تفاصيل ${offer.titleAr}`}
               >
                 <Image
