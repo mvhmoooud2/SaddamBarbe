@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Phone, MapPin, Clock, MessageCircle } from "lucide-react";
 import { siteConfig, whatsappLink } from "@/data/site-config";
 import { branches } from "@/data/branches";
-import { asset } from "@/lib/base-path";
+import { asset, basePath } from "@/lib/base-path";
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -136,6 +136,14 @@ export default function Footer() {
 
         <div className="mt-12 border-t border-[#c9a227]/10 py-6 text-center text-sm text-[#f5f0e6]/50">
           © {new Date().getFullYear()} {siteConfig.nameEn}. جميع الحقوق محفوظة.
+          {/* لينك لوحة التحكم — بيظهر صغير للإدارة بس، والدخول محتاج كلمة سر */}
+          <span className="mx-2 text-[#f5f0e6]/20">•</span>
+          <a
+            href={`${basePath}/admin`}
+            className="transition-colors hover:text-[#c9a227]"
+          >
+            لوحة التحكم
+          </a>
         </div>
       </div>
     </footer>
