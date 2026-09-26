@@ -14,3 +14,6 @@ next-env.d.ts
 
 # PostgreSQL محلي للتطوير (بره git)
 .pg-local/
+
+# ملف فيه بيانات اتصال حساسة — مش بيترفع على GitHub
+قيم-Vercel.txt
