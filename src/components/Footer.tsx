@@ -1,6 +1,8 @@
-import { Scissors, Phone, MapPin, Clock, MessageCircle } from "lucide-react";
+import Image from "next/image";
+import { Phone, MapPin, Clock, MessageCircle } from "lucide-react";
 import { siteConfig, whatsappLink } from "@/data/site-config";
 import { branches } from "@/data/branches";
+import { asset } from "@/lib/base-path";
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -48,11 +50,14 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-6">
         <div className="grid gap-12 md:grid-cols-3">
           <div>
-            <div className="flex items-center gap-2">
-              <Scissors className="h-6 w-6 text-[#c9a227]" />
-              <span className="text-xl font-bold tracking-wider">
-                SADDAM <span className="text-[#c9a227]">BARBER</span>
-              </span>
+            <div className="flex items-center">
+              <Image
+                src={asset("/images/IMG_6588.jpeg")}
+                alt="شعار صالون صدام للحلاقة"
+                width={225}
+                height={64}
+                className="h-12 w-auto object-contain"
+              />
             </div>
             <p className="mt-4 text-sm leading-relaxed text-[#f5f0e6]/70">
               {siteConfig.nameAr} يقدم تجربة حلاقة فاخرة بأيدي محترفين. نحرص على
