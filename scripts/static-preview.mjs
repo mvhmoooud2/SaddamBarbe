@@ -4,7 +4,7 @@
 //    npm run build:pages
 //    npm run preview:static
 //
-//  GitHub Pages بيخدم المستودع على /SaddamBarbe مش على الجذر،
+//  GitHub Pages بيخدم المستودع على /SaddamBarber مش على الجذر،
 //  فالسكربت ده بيعمل نفس الحاجة محلياً علشان تتأكد إن كل
 //  ملفات CSS/JS/الصور بتحمّل صح قبل النشر.
 // ============================================================
@@ -16,7 +16,7 @@ import { dirname } from "node:path";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT_DIR = join(ROOT, "out");
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "/SaddamBarbe";
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "/SaddamBarber";
 const PORT = Number(process.env.PORT || process.argv[2] || 4000);
 const HOST = process.env.HOST || "0.0.0.0";
 

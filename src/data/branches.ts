@@ -30,6 +30,8 @@ export type Branch = {
   addressAr: string;
   /** علامة مميزة / Plus Code يساعد الزائر يلاقي الفرع (اختياري) */
   landmarkAr?: string;
+  /** سطر تعريفي صغير جوه كارت الفرع (اختياري) */
+  summaryAr?: string;
   /** رقم التليفون زي ما بيظهر للزائر */
   phoneDisplay: string;
   /** نفس الرقم بلينك اتصال مباشر */
@@ -63,6 +65,8 @@ export const branches: Branch[] = [
     badgeAr: "الفرع الرئيسي",
     addressAr: "87 شارع مصر والسودان، حدائق القبة، القاهرة",
     landmarkAr: "Plus Code: 37HH+J6 حدائق القبة",
+    summaryAr:
+      "حلاقة وعناية: قص وشعر ودقن وبشرة وشعر وأظافر — بدون ساونا أو جاكوزي.",
     phoneDisplay: "010 6140 2242",
     phoneHref: "tel:+201061402242",
     whatsapp: "201061402242",
@@ -79,6 +83,8 @@ export const branches: Branch[] = [
     listingNameAr: "MS صدام — صالون صدام",
     addressAr: "شارع عباس العقاد، مدينة نصر، القاهرة",
     landmarkAr: "Plus Code: 387P+8M مدينة نصر",
+    summaryAr:
+      "VIP MEN EXPERIENCE: الخدمات الأساسية + ساونا علاجية واستيم وحمام مغربي وجاكوزي ومساج.",
     phoneDisplay: "011 2153 7537",
     phoneHref: "tel:+201121537537",
     whatsapp: "201121537537",

@@ -5,7 +5,8 @@ import { Clock, Info, MapPin, Scissors, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { Service } from "@/db/schema";
 import { asset } from "@/lib/base-path";
-import { branches } from "@/data/branches";
+import { branches as staticBranches, type Branch } from "@/data/branches";
+import { setting, type SiteSettingsMap } from "@/lib/site-settings";
 import { getBranchServiceOptions } from "@/data/branch-services";
 import {
   BRANCH_SELECTION_EVENT,
@@ -14,6 +15,8 @@ import BookServiceButton from "@/components/BookServiceButton";
 
 interface ServicesProps {
   services: Service[];
+  branches?: Branch[];
+  settings?: SiteSettingsMap;
 }
 
 function formatPrice(price: string | number) {
@@ -28,7 +31,11 @@ const serviceImageOverrides: Record<string, string[]> = {
   توبيك: ["/images/service-toppik.jpeg"],
 };
 
-export default function Services({ services }: ServicesProps) {
+export default function Services({
+  services,
+  branches = staticBranches,
+  settings,
+}: ServicesProps) {
   const [selectedBranchId, setSelectedBranchId] = useState(branches[0]?.id ?? "");
 
   useEffect(() => {
@@ -41,7 +48,7 @@ export default function Services({ services }: ServicesProps) {
 
     window.addEventListener(BRANCH_SELECTION_EVENT, onBranchSelected);
     return () => window.removeEventListener(BRANCH_SELECTION_EVENT, onBranchSelected);
-  }, []);
+  }, [branches]);
 
   const selectedBranch =
     branches.find((branch) => branch.id === selectedBranchId) ?? branches[0];
@@ -65,14 +72,13 @@ export default function Services({ services }: ServicesProps) {
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-10 text-center">
           <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-[#c9a227]">
-            اختار الفرع الأول
+            {setting(settings, "servicesKicker")}
           </p>
           <h2 className="text-3xl font-bold text-[#f5f0e6] md:text-4xl">
-            خدمات كل فرع بوضوح
+            {setting(settings, "servicesTitle")}
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-[#f5f0e6]/70">
-            مفيش قائمة واحدة ملخبطة: اختار فرعك وهتشوف الخدمات المتاحة فيه فقط،
-            وبعدها احجز الخدمة على واتساب في ضغطة.
+            {setting(settings, "servicesSubtitle")}
           </p>
         </div>
 

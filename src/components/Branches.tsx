@@ -11,13 +11,14 @@ import {
   ZoomIn,
 } from "lucide-react";
 import {
-  branches,
+  branches as staticBranches,
   branchWhatsappLink,
   directionsUrl,
   mapEmbedUrl,
+  type Branch,
 } from "@/data/branches";
-import { siteConfig } from "@/data/site-config";
 import { asset } from "@/lib/base-path";
+import { setting, type SiteSettingsMap } from "@/lib/site-settings";
 
 /**
  * قسم «فروعنا»: كارت لكل فرع فيه الخريطة + العنوان + المواعيد + رقم التليفون
@@ -29,9 +30,19 @@ import { asset } from "@/lib/base-path";
  *
  * ولو الفرع عنده صورة قائمة أسعار (priceListImage) بتتعرض في بلوك
  * «قائمة الأسعار» تحت الخريطة — الصورة بتتحمّل بـ asset() علشان مسار
- * GitHub Pages (/SaddamBarbe) يبقى صح.
+ * GitHub Pages (/SaddamBarber) يبقى صح.
  */
-export default function Branches() {
+type BranchesProps = {
+  branches?: Branch[];
+  settings?: SiteSettingsMap;
+};
+
+export default function Branches({
+  branches = staticBranches,
+  settings,
+}: BranchesProps) {
+  const salonName = setting(settings, "siteNameAr");
+
   if (branches.length === 0) return null;
 
   return (
@@ -43,14 +54,13 @@ export default function Branches() {
         <div className="mb-16 text-center">
           <p className="mb-3 flex items-center justify-center gap-2 text-sm font-medium uppercase tracking-[0.2em] text-[#c9a227]">
             <Store className="h-4 w-4" />
-            فروعنا
+            {setting(settings, "branchesKicker")}
           </p>
           <h2 className="text-3xl font-bold text-[#f5f0e6] md:text-4xl">
-            أقرب فرع ليك مستنيك
+            {setting(settings, "branchesTitle")}
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-[#f5f0e6]/70">
-            فرعينا في القاهرة: حدائق القبة ومدينة نصر. اختار الفرع الأقرب لك،
-            وشوف مكانه على الخريطة، وكلمنا مباشرة أو احجز على واتساب في ثواني.
+            {setting(settings, "branchesSubtitle")}
           </p>
         </div>
 
@@ -124,12 +134,11 @@ export default function Branches() {
                       {branch.listingNameAr}
                     </p>
                   )}
-                  <p className="mt-3 rounded-xl border border-[#c9a227]/15 bg-[#0f0f0f]/60 px-3 py-2 text-xs leading-relaxed text-[#f5f0e6]/70">
-                    {branch.id === "nasr-city"
-                      ? "VIP MEN EXPERIENCE: الخدمات الأساسية + ساونا علاجية واستيم وحمام مغربي وجاكوزي ومساج."
-                      : "حلاقة وعناية: قص وشعر ودقن وبشرة وشعر وأظافر — بدون ساونا أو جاكوزي."
-                    }
-                  </p>
+                  {branch.summaryAr && (
+                    <p className="mt-3 rounded-xl border border-[#c9a227]/15 bg-[#0f0f0f]/60 px-3 py-2 text-xs leading-relaxed text-[#f5f0e6]/70">
+                      {branch.summaryAr}
+                    </p>
+                  )}
                 </div>
 
                 <ul className="space-y-3 text-sm text-[#f5f0e6]/80">
@@ -213,7 +222,7 @@ export default function Branches() {
                     اتصل بالفرع
                   </a>
                   <a
-                    href={branchWhatsappLink(branch, siteConfig.nameAr)}
+                    href={branchWhatsappLink(branch, salonName)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 rounded-full border border-[#c9a227]/40 px-5 py-3 text-sm font-semibold text-[#c9a227] transition-colors hover:bg-[#c9a227] hover:text-[#0f0f0f]"

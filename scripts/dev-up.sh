@@ -101,6 +101,7 @@ const { Client } = require('$ROOT/node_modules/pg');
 
 # ---------- 6) تشغيل الموقع ----------
 log "[6/6] تشغيل الموقع"
-echo "   http://localhost:3000"
+echo "   الموقع:        http://localhost:3000"
+echo "   لوحة التحكم:   http://localhost:3000/admin  (كلمة السر: ${ADMIN_PASSWORD:-saddam2026})"
 echo ""
 exec npm run dev
