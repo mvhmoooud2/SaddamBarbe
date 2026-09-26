@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
-import { db } from "@/db";
 import { isAuthenticated } from "@/lib/admin-auth";
 import { getResource } from "@/data/admin-fields";
-import { getTable, sanitizeBody } from "@/lib/admin-tables";
+import { deleteRow, getTable, sanitizeBody, updateRow } from "@/lib/admin-tables";
 
 export const dynamic = "force-dynamic";
 
@@ -46,20 +44,15 @@ export async function PATCH(request: Request, { params }: Params) {
   }
 
   try {
-    const [row] = await db
-      .update(config.table)
-      .set(values)
-      .where(eq(config.table.id, numericId))
-      .returning();
-
+    const row = await updateRow(resource, numericId, values);
     if (!row) {
       return NextResponse.json({ error: "الصف مش موجود" }, { status: 404 });
     }
     return NextResponse.json(row);
-  } catch (error) {
+  } catch (error: any) {
     console.error(`[admin] فشل تعديل ${resource}:`, error);
     return NextResponse.json(
-      { error: "مش قادرين نحفظ التعديل دلوقتي" },
+      { error: error?.message || "مش قادرين نحفظ التعديل دلوقتي" },
       { status: 503 }
     );
   }
@@ -77,7 +70,7 @@ export async function DELETE(_request: Request, { params }: Params) {
   }
 
   try {
-    await db.delete(config.table).where(eq(config.table.id, numericId));
+    await deleteRow(resource, numericId);
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error(`[admin] فشل حذف ${resource}:`, error);

@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
-import { isAuthenticated } from "@/lib/admin-auth";
+import { getAdminUser, isAuthenticated } from "@/lib/admin-auth";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return NextResponse.json({ authenticated: await isAuthenticated() });
+  const user = await getAdminUser();
+  return NextResponse.json({
+    authenticated: Boolean(user),
+    user,
+    supabaseConnected: isSupabaseConfigured,
+  });
 }

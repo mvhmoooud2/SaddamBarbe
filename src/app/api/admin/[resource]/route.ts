@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
-import { db } from "@/db";
 import { isAuthenticated } from "@/lib/admin-auth";
 import { getResource } from "@/data/admin-fields";
-import { getTable, listRows, sanitizeBody } from "@/lib/admin-tables";
+import { createRow, getTable, listRows, sanitizeBody } from "@/lib/admin-tables";
 
 export const dynamic = "force-dynamic";
 
 type Params = { params: Promise<{ resource: string }> };
 
-/** كل الصفوف (المفعّلة والمخفية) لمورد معيّن */
+/** كل الصفوف لمورد معيّن */
 export async function GET(_request: Request, { params }: Params) {
   if (!(await isAuthenticated())) {
     return NextResponse.json({ error: "غير مصرح" }, { status: 401 });
@@ -20,7 +19,8 @@ export async function GET(_request: Request, { params }: Params) {
   }
 
   try {
-    return NextResponse.json(await listRows(resource));
+    const rows = await listRows(resource);
+    return NextResponse.json(rows);
   } catch (error) {
     console.error(`[admin] فشل تحميل ${resource}:`, error);
     return NextResponse.json(
@@ -64,15 +64,12 @@ export async function POST(request: Request, { params }: Params) {
   }
 
   try {
-    const rows = (await db
-      .insert(config.table)
-      .values(values)
-      .returning()) as Record<string, unknown>[];
-    return NextResponse.json(rows[0], { status: 201 });
-  } catch (error) {
+    const row = await createRow(resource, values);
+    return NextResponse.json(row, { status: 201 });
+  } catch (error: any) {
     console.error(`[admin] فشل إضافة ${resource}:`, error);
     return NextResponse.json(
-      { error: "مش قادرين نحفظ البيانات دلوقتي" },
+      { error: error?.message || "مش قادرين نحفظ البيانات دلوقتي" },
       { status: 503 }
     );
   }
