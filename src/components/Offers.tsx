@@ -2,16 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import {
-  BadgePercent,
-  CalendarCheck,
-  Check,
-  Clock,
-  Tag,
-  X,
-} from "lucide-react";
+import { BadgePercent, Check, Clock, Crown, MessageCircle, Tag, X } from "lucide-react";
 import type { Offer } from "@/db/schema";
 import { asset } from "@/lib/base-path";
+import {
+  branches,
+  branchWhatsappLinkWithMessage,
+} from "@/data/branches";
 
 interface OffersProps {
   offers: Offer[];
@@ -32,12 +29,25 @@ function savings(oldPrice: string | number, newPrice: string | number) {
   return Math.max(0, Number(oldPrice) - Number(newPrice)).toFixed(0);
 }
 
+function normalizeOfferText(line: string) {
+  return line
+    .replace("باديكير يد", "مانيكير يد")
+    .replace("بدكير", "باديكير")
+    .replace("ساونا واسترخاء", "ساونا علاجية واسترخاء");
+}
+
 function offerDetails(details: string | null) {
   if (!details) return [];
   return details
     .split("\n")
-    .map((line) => line.trim())
+    .map((line) => normalizeOfferText(line.trim()))
     .filter(Boolean);
+}
+
+function offerTitle(title: string) {
+  return title.includes("VIP") && !title.includes("👑")
+    ? `${title} 👑`
+    : title;
 }
 
 function formatValidUntil(date: Date | null) {
@@ -51,6 +61,14 @@ function formatValidUntil(date: Date | null) {
   } catch {
     return null;
   }
+}
+
+function offerWhatsappLink(offer: Offer) {
+  const nasrCity = branches.find((branch) => branch.id === "nasr-city") ?? branches[0];
+  const message = `السلام عليكم، عايز أحجز ${offerTitle(offer.titleAr)} بسعر ${formatPrice(
+    offer.newPrice,
+  )} جنيه في فرع مدينة نصر – عباس العقاد.`;
+  return nasrCity ? branchWhatsappLinkWithMessage(nasrCity, message) : "#booking";
 }
 
 export default function Offers({ offers }: OffersProps) {
@@ -85,68 +103,92 @@ export default function Offers({ offers }: OffersProps) {
   return (
     <section id="offers" className="section-padding bg-[#0f0f0f]">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-16 text-center">
+        <div className="mb-12 text-center">
           <p className="mb-3 flex items-center justify-center gap-2 text-sm font-medium uppercase tracking-[0.2em] text-[#c9a227]">
             <Tag className="h-4 w-4" />
             عروض خاصة
           </p>
           <h2 className="text-3xl font-bold text-[#f5f0e6] md:text-4xl">
-            عروضنا وخصوماتنا
+            عروض العرسان وتجارب VIP
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-[#f5f0e6]/70">
-            اختر العرض المناسب لك واستفيد من أسعارنا المخفّضة. اضغط على صورة أي
-            عرض لمعرفة تفاصيله الكاملة وحجز موعدك فوراً.
+            كل عرض واضح بسعره القديم والجديد وخدماته بالتفصيل. العروض متاحة في
+            فرع مدينة نصر – عباس العقاد، واحجزها مباشرة على واتساب.
           </p>
         </div>
 
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {offers.map((offer) => (
-            <article
-              key={offer.id}
-              className="group flex flex-col overflow-hidden rounded-2xl border border-[#c9a227]/20 bg-[#1a1a1a] transition-all duration-300 hover:-translate-y-2 hover:border-[#c9a227]/50 hover:shadow-[0_0_40px_rgba(201,162,39,0.12)]"
-            >
-              <button
-                type="button"
-                onClick={() => setActiveOffer(offer)}
-                className="relative block aspect-[4/5] w-full overflow-hidden text-right"
-                aria-label={`عرض تفاصيل ${offer.titleAr}`}
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {offers.map((offer) => {
+            const detailsPreview = offerDetails(offer.detailsAr).slice(0, 4);
+            const discount = discountPercent(offer.oldPrice, offer.newPrice);
+            return (
+              <article
+                key={offer.id}
+                className="group flex flex-col overflow-hidden rounded-2xl border border-[#c9a227]/20 bg-[#1a1a1a] transition-all duration-300 hover:-translate-y-2 hover:border-[#c9a227]/50 hover:shadow-[0_0_40px_rgba(201,162,39,0.12)]"
               >
-                <Image
-                  src={asset(offer.imageUrl || "/images/hero.jpg")}
-                  alt={`${offer.titleAr} - السعر قبل العرض ${formatPrice(
-                    offer.oldPrice,
-                  )} جنيه وبعد العرض ${formatPrice(offer.newPrice)} جنيه`}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/70 via-transparent to-transparent" />
-
-                <span className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                  <span className="rounded-full border border-[#c9a227] bg-[#0f0f0f]/85 px-4 py-2 text-sm font-semibold text-[#c9a227] backdrop-blur-sm">
-                    شاهد تفاصيل العرض
-                  </span>
-                </span>
-              </button>
-
-              <div className="flex flex-1 flex-col p-6">
-                <p className="mb-5 text-sm leading-relaxed text-[#f5f0e6]/70">
-                  {offer.descriptionAr}
-                </p>
-
                 <button
                   type="button"
                   onClick={() => setActiveOffer(offer)}
-                  className="mt-auto w-full rounded-full border border-[#c9a227]/40 py-3 text-sm font-semibold text-[#c9a227] transition-colors hover:bg-[#c9a227] hover:text-[#0f0f0f]"
+                  className="relative block aspect-[4/5] w-full overflow-hidden text-right"
+                  aria-label={`عرض تفاصيل ${offerTitle(offer.titleAr)}`}
                 >
-                  تفاصيل العرض
+                  <Image
+                    src={asset(offer.imageUrl || "/images/hero.jpg")}
+                    alt={`${offerTitle(offer.titleAr)} - ${formatPrice(offer.newPrice)} جنيه فقط`}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/80 via-transparent to-transparent" />
+                  <span className="absolute end-4 top-4 rounded-full bg-[#c9a227] px-3 py-1 text-xs font-black text-[#0f0f0f]">
+                    خصم {discount}%
+                  </span>
+                  <span className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    <span className="rounded-full border border-[#c9a227] bg-[#0f0f0f]/85 px-4 py-2 text-sm font-semibold text-[#c9a227] backdrop-blur-sm">
+                      شاهد التفاصيل
+                    </span>
+                  </span>
                 </button>
-              </div>
-            </article>
-          ))}
+
+                <div className="flex flex-1 flex-col p-5">
+                  <div className="mb-3 flex items-center gap-2 text-[#c9a227]">
+                    <Crown className="h-4 w-4" />
+                    <h3 className="text-lg font-bold text-[#f5f0e6]">
+                      {offerTitle(offer.titleAr)}
+                    </h3>
+                  </div>
+                  <div className="mb-4 rounded-xl border border-[#c9a227]/15 bg-[#0f0f0f] p-3">
+                    <span className="block text-xs text-[#f5f0e6]/45">بدلًا من</span>
+                    <span className="text-sm font-bold text-[#f5f0e6]/45 line-through">
+                      {formatPrice(offer.oldPrice)} جنيه
+                    </span>
+                    <span className="mt-1 block text-2xl font-black text-[#c9a227]">
+                      {formatPrice(offer.newPrice)} جنيه فقط
+                    </span>
+                  </div>
+                  <ul className="mb-5 space-y-2 text-sm text-[#f5f0e6]/75">
+                    {detailsPreview.map((line, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#c9a227]" />
+                        <span>{line}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    type="button"
+                    onClick={() => setActiveOffer(offer)}
+                    className="mt-auto flex w-full items-center justify-center gap-2 rounded-full bg-[#c9a227] py-3 text-sm font-black text-[#0f0f0f] transition-transform hover:scale-[1.02]"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    🔥 احجز عرضك الآن
+                  </button>
+                </div>
+              </article>
+            );
+          })}
         </div>
 
         <p className="mt-10 text-center text-sm text-[#f5f0e6]/50">
-          جميع الأسعار بالجنيه المصري · العروض سارية حتى تاريخ الانتهاء المذكور
+          جميع الأسعار بالجنيه المصري · اضغط على أي عرض لرؤية كل الخدمات الموجودة فيه
         </p>
       </div>
 
@@ -156,7 +198,7 @@ export default function Offers({ offers }: OffersProps) {
           onClick={closeModal}
           role="dialog"
           aria-modal="true"
-          aria-label={activeOffer.titleAr}
+          aria-label={offerTitle(activeOffer.titleAr)}
         >
           <div
             className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-[#c9a227]/30 bg-[#1a1a1a] shadow-[0_0_60px_rgba(201,162,39,0.15)]"
@@ -166,7 +208,7 @@ export default function Offers({ offers }: OffersProps) {
               <div className="mb-6 flex items-start justify-between gap-4">
                 <div>
                   <h3 className="text-2xl font-bold text-[#f5f0e6]">
-                    {activeOffer.titleAr}
+                    {offerTitle(activeOffer.titleAr)}
                   </h3>
                   {activeOffer.badgeAr && (
                     <span className="mt-2 inline-block rounded-full bg-[#c9a227]/15 px-3 py-1 text-xs font-bold text-[#c9a227]">
@@ -190,34 +232,26 @@ export default function Offers({ offers }: OffersProps) {
 
               <div className="mb-6 flex flex-wrap items-center gap-4 rounded-2xl border border-[#c9a227]/20 bg-[#0f0f0f] p-4">
                 <div>
-                  <span className="block text-xs text-[#f5f0e6]/40">
-                    قبل العرض
-                  </span>
+                  <span className="block text-xs text-[#f5f0e6]/40">قبل العرض</span>
                   <span className="text-lg font-bold text-[#f5f0e6]/40 line-through">
-                    {formatPrice(activeOffer.oldPrice)} ج.م
+                    {formatPrice(activeOffer.oldPrice)} جنيه
                   </span>
                 </div>
-
                 <BadgePercent className="h-5 w-5 text-[#c9a227]" />
-
                 <div>
-                  <span className="block text-xs text-[#c9a227]">
-                    بعد العرض
-                  </span>
+                  <span className="block text-xs text-[#c9a227]">بعد العرض</span>
                   <span className="text-2xl font-black text-[#c9a227]">
-                    {formatPrice(activeOffer.newPrice)} ج.م
+                    {formatPrice(activeOffer.newPrice)} جنيه فقط
                   </span>
                 </div>
-
                 <span className="ms-auto rounded-full bg-[#c9a227]/15 px-3 py-1 text-xs font-bold text-[#c9a227]">
-                  وفّرت {savings(activeOffer.oldPrice, activeOffer.newPrice)}{" "}
-                  ج.م
+                  وفّرت {savings(activeOffer.oldPrice, activeOffer.newPrice)} جنيه
                 </span>
               </div>
 
               <h4 className="mb-4 flex items-center gap-2 text-lg font-bold text-[#f5f0e6]">
                 <Check className="h-5 w-5 text-[#c9a227]" />
-                تفاصيل العرض
+                الخدمات الموجودة في العرض
               </h4>
 
               {details.length > 0 ? (
@@ -248,12 +282,14 @@ export default function Offers({ offers }: OffersProps) {
               )}
 
               <a
-                href="#booking"
+                href={offerWhatsappLink(activeOffer)}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={closeModal}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#c9a227] px-6 py-4 text-lg font-bold text-[#0f0f0f] transition-transform hover:scale-[1.02]"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-4 text-lg font-black text-[#071b0d] transition-transform hover:scale-[1.02]"
               >
-                <CalendarCheck className="h-5 w-5" />
-                الحجز
+                <MessageCircle className="h-5 w-5" />
+                🔥 احجز عرضك الآن
               </a>
             </div>
           </div>

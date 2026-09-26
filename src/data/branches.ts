@@ -75,9 +75,9 @@ export const branches: Branch[] = [
   },
   {
     id: "nasr-city",
-    nameAr: "فرع مدينة نصر",
+    nameAr: "فرع مدينة نصر – عباس العقاد",
     listingNameAr: "MS صدام — صالون صدام",
-    addressAr: "28 شارع محمد مصطفى حمام، مدينة نصر، القاهرة",
+    addressAr: "شارع عباس العقاد، مدينة نصر، القاهرة",
     landmarkAr: "Plus Code: 387P+8M مدينة نصر",
     phoneDisplay: "011 2153 7537",
     phoneHref: "tel:+201121537537",

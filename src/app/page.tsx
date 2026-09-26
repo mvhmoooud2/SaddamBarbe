@@ -1,45 +1,31 @@
 import { connection } from "next/server";
 import { db } from "@/db";
-import { services, testimonials, offers } from "@/db/schema";
+import { services, offers } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import {
-  fallbackServices,
-  fallbackTestimonials,
-  fallbackOffers,
-} from "@/data/fallback";
+import { fallbackServices, fallbackOffers } from "@/data/fallback";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Services from "@/components/Services";
 import Offers from "@/components/Offers";
-import Stats from "@/components/Stats";
 import GallerySlider from "@/components/GallerySlider";
 import Branches from "@/components/Branches";
 import BookingForm from "@/components/BookingForm";
 import Testimonials from "@/components/Testimonials";
 import Footer from "@/components/Footer";
+import FixedWhatsappButton from "@/components/FixedWhatsappButton";
 
-// ملاحظة مهمة:
-// في التشغيل العادي الصفحة لازم تقرأ من قاعدة البيانات مع كل طلب، وبنعمل ده
-// بنداء connection() جوه loadSiteData (ده بيخلي المسار dynamic من غير ما نحتاج
-// سطر export const dynamic = "force-dynamic" اللي التصدير الثابت بيرفضه).
-// في نسخة GitHub Pages الثابتة بنتخطى النداء ده لأن مفيش سيرفر أصلاً.
-
-/** بيقرأ الداتا من الداتابيز، ولو الداتابيز مش متاحة بيستخدم البيانات الثابتة */
+// في نسخة GitHub Pages بنتخطى قاعدة البيانات ونستخدم البيانات الثابتة.
+// في التشغيل العادي الصفحة بتقرأ أحدث الخدمات والعروض، ولو قاعدة البيانات
+// غير متاحة بنرجع تلقائياً للداتا الاحتياطية علشان الموقع يفضل شغال.
 async function loadSiteData() {
-  // النسخة الثابتة مالهاش قاعدة بيانات → نستخدم البيانات الثابتة على طول
   if (process.env.STATIC_EXPORT === "1") {
-    return {
-      servicesData: fallbackServices,
-      testimonialsData: fallbackTestimonials,
-      offersData: fallbackOffers,
-    };
+    return { servicesData: fallbackServices, offersData: fallbackOffers };
   }
 
-  // بنستنى الطلب الفعلي علشان الصفحة تتولّد مع كل زيارة (بيانات حديثة دايماً)
   await connection();
 
   try {
-    const [servicesData, testimonialsData, offersData] = await Promise.all([
+    const [servicesData, offersData] = await Promise.all([
       db
         .select()
         .from(services)
@@ -47,33 +33,23 @@ async function loadSiteData() {
         .orderBy(services.id),
       db
         .select()
-        .from(testimonials)
-        .where(eq(testimonials.isActive, true))
-        .orderBy(testimonials.id),
-      db
-        .select()
         .from(offers)
         .where(eq(offers.isActive, true))
         .orderBy(offers.id),
     ]);
 
-    return { servicesData, testimonialsData, offersData };
+    return { servicesData, offersData };
   } catch (error) {
     console.warn(
       "[fallback] قاعدة البيانات غير متاحة، يتم استخدام البيانات الثابتة:",
-      error
+      error,
     );
-    return {
-      servicesData: fallbackServices,
-      testimonialsData: fallbackTestimonials,
-      offersData: fallbackOffers,
-    };
+    return { servicesData: fallbackServices, offersData: fallbackOffers };
   }
 }
 
 export default async function HomePage() {
-  const { servicesData, testimonialsData, offersData } =
-    await loadSiteData();
+  const { servicesData, offersData } = await loadSiteData();
 
   return (
     <>
@@ -82,13 +58,13 @@ export default async function HomePage() {
         <Hero />
         <Services services={servicesData} />
         <Offers offers={offersData} />
-        <Stats />
         <GallerySlider />
         <Branches />
         <BookingForm services={servicesData} offers={offersData} />
-        <Testimonials testimonials={testimonialsData} />
+        <Testimonials />
       </main>
       <Footer />
+      <FixedWhatsappButton />
     </>
   );
 }

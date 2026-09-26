@@ -1,45 +1,47 @@
 "use client";
 
-import { CalendarClock } from "lucide-react";
+import { CalendarClock, MessageCircle } from "lucide-react";
+import { branchWhatsappLinkWithMessage, type Branch } from "@/data/branches";
 
 /**
- * اسم الحدث اللي بينبث لما الزائر يضغط «احجز هذه الخدمة» من كارت خدمة.
- * نموذج الحجز (قسم #booking) بيسمع الحدث ده وبتحدد الخدمة دي
- * تلقائياً في قائمة «الخدمة» جوه الفورم.
+ * اسم الحدث اللي بينبث لما الزائر يضغط «احجز الخدمة» من كارت خدمة.
+ * نموذج الحجز يقدر يلتقطه لو العميل قرر يكمل من الفورم.
  */
 export const BOOK_SERVICE_EVENT = "saddam:book-service";
 
 interface BookServiceButtonProps {
-  /** معرّف الخدمة اللي هتتحدد تلقائياً في نموذج الحجز */
   serviceId: number;
+  serviceName: string;
+  branch: Branch;
 }
 
-/**
- * زر الحجز اللي تحت كل خدمة: بينزل بسرعة لقسم الحجز،
- * وفي نفس الوقت بيبلّغ الفورم يحدد الخدمة دي على طول.
- *
- * (الرابط `#booking` شغال حتى لو الجافاسكريبت مقفول —
- * بس وقتها من غير تحديد الخدمة تلقائياً.)
- */
 export default function BookServiceButton({
   serviceId,
+  serviceName,
+  branch,
 }: BookServiceButtonProps) {
+  const message = `السلام عليكم، عايز أحجز خدمة ${serviceName} في ${branch.nameAr}.`;
+  const link = branchWhatsappLinkWithMessage(branch, message);
+
   const handleClick = () => {
-    // بنبعت معرّف الخدمة قبل ما المتصفح ينزّل لقسم الحجز،
-    // علشان الفورم يلاقي الخدمة محددة وجاهزة
     window.dispatchEvent(
-      new CustomEvent<number>(BOOK_SERVICE_EVENT, { detail: serviceId })
+      new CustomEvent<{ serviceId: number; branchId: string }>(BOOK_SERVICE_EVENT, {
+        detail: { serviceId, branchId: branch.id },
+      }),
     );
   };
 
   return (
     <a
-      href="#booking"
+      href={link}
+      target="_blank"
+      rel="noopener noreferrer"
       onClick={handleClick}
-      className="mt-5 flex w-full items-center justify-center gap-2 rounded-full border border-[#c9a227]/40 bg-[#c9a227]/10 px-5 py-3 text-sm font-bold text-[#c9a227] transition-colors hover:bg-[#c9a227] hover:text-[#0f0f0f]"
+      className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-bold text-[#071b0d] transition-transform hover:scale-[1.02]"
     >
+      <MessageCircle className="h-4 w-4" />
+      <span>احجز الخدمة</span>
       <CalendarClock className="h-4 w-4" />
-      احجز هذه الخدمة
     </a>
   );
 }

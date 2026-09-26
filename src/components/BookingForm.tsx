@@ -16,6 +16,7 @@ import type { Service, Offer } from "@/db/schema";
 import { basePath } from "@/lib/base-path";
 import { siteConfig, whatsappLinkTo } from "@/data/site-config";
 import { branches, branchWhatsappLinkWithMessage } from "@/data/branches";
+import { getBranchServiceOptions } from "@/data/branch-services";
 import { BOOK_SERVICE_EVENT } from "@/components/BookServiceButton";
 
 interface BookingFormProps {
@@ -26,15 +27,20 @@ interface BookingFormProps {
 /** قيمة خيار العرض في قائمة الحجز (مميزة عن معرّفات الخدمات) */
 const offerValue = (id: number) => `offer-${id}`;
 
-const emptyForm = (services: Service[]) => ({
+const emptyForm = (services: Service[]) => {
+  const branchId = branches.length > 0 ? branches[0].id : "";
+  const branchServices = getBranchServiceOptions(branchId, services);
+
+  return {
   customerName: "",
   customerPhone: "",
-  serviceId: services.length > 0 ? String(services[0].id) : "",
-  branchId: branches.length > 0 ? branches[0].id : "",
+  serviceId: branchServices.length > 0 ? String(branchServices[0].id) : "",
+  branchId,
   date: "",
   time: "",
   notes: "",
-});
+  };
+};
 
 /** تاريخ النهاردة بتوقيت المستخدم (مش UTC) علشان يمنع اختيار يوم عدّى */
 function localToday() {
@@ -64,13 +70,18 @@ export default function BookingForm({ services, offers }: BookingFormProps) {
   // تلقائياً في قائمة الفورم وبنضوي على الفورم لحظة علشان يلاقيه بسرعة
   useEffect(() => {
     const onBookService = (event: Event) => {
-      const serviceId = (event as CustomEvent<number>).detail;
-      if (
-        !services.some((service) => String(service.id) === String(serviceId))
-      ) {
+      const detail = (event as CustomEvent<number | { serviceId: number; branchId: string }>).detail;
+      const serviceId = typeof detail === "number" ? detail : detail.serviceId;
+      const branchId = typeof detail === "number" ? formData.branchId : detail.branchId;
+      const availableServices = getBranchServiceOptions(branchId, services);
+      if (!availableServices.some((service) => String(service.id) === String(serviceId))) {
         return;
       }
-      setFormData((prev) => ({ ...prev, serviceId: String(serviceId) }));
+      setFormData((prev) => ({
+        ...prev,
+        branchId,
+        serviceId: String(serviceId),
+      }));
       setMessage(null);
       setWhatsappFallback(null);
       setIsHighlighted(true);
@@ -78,7 +89,7 @@ export default function BookingForm({ services, offers }: BookingFormProps) {
 
     window.addEventListener(BOOK_SERVICE_EVENT, onBookService);
     return () => window.removeEventListener(BOOK_SERVICE_EVENT, onBookService);
-  }, [services]);
+  }, [formData.branchId, services]);
 
   // الإضاءة بتروح لوحدها بعد لحظة
   useEffect(() => {
@@ -98,7 +109,16 @@ export default function BookingForm({ services, offers }: BookingFormProps) {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "branchId") {
+      const nextServices = getBranchServiceOptions(value, services);
+      setFormData((prev) => ({
+        ...prev,
+        branchId: value,
+        serviceId: nextServices.length > 0 ? String(nextServices[0].id) : "",
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
     setMessage(null);
     setWhatsappFallback(null);
   };
@@ -107,9 +127,11 @@ export default function BookingForm({ services, offers }: BookingFormProps) {
   const selectedBranch = () =>
     branches.find((branch) => branch.id === formData.branchId) ?? branches[0];
 
+  const serviceOptions = getBranchServiceOptions(formData.branchId, services);
+
   /** نص رسالة الواتساب الجاهزة (بتُستخدم لما الـ API مش متاح) */
   const bookingText = () => {
-    const service = services.find((item) => String(item.id) === formData.serviceId);
+    const service = serviceOptions.find((item) => String(item.id) === formData.serviceId);
     const offer = offers.find((item) => offerValue(item.id) === formData.serviceId);
     const branch = selectedBranch();
 
@@ -120,7 +142,7 @@ export default function BookingForm({ services, offers }: BookingFormProps) {
       branch ? `الفرع: ${branch.nameAr}` : "",
       offer
         ? `العرض: ${offer.titleAr} — ${Number(offer.newPrice).toFixed(0)} ج.م`
-        : `الخدمة: ${service ? service.nameAr : "غير محددة"}`,
+        : `الخدمة: ${service ? service.displayNameAr : "غير محددة"}`,
       `الميعاد: ${formData.date} - ${formData.time}`,
       formData.notes ? `ملاحظات: ${formData.notes}` : "",
     ]
@@ -322,14 +344,14 @@ export default function BookingForm({ services, offers }: BookingFormProps) {
                 required
                 className="w-full rounded-xl border border-[#c9a227]/20 bg-[#1a1a1a] px-4 py-3 text-[#f5f0e6] outline-none transition-colors focus:border-[#c9a227]"
               >
-                {services.length === 0 && offers.length === 0 && (
+                {serviceOptions.length === 0 && offers.length === 0 && (
                   <option value="">لا توجد خدمات متاحة</option>
                 )}
-                {services.length > 0 && (
-                  <optgroup label="الخدمات">
-                    {services.map((service) => (
+                {serviceOptions.length > 0 && (
+                  <optgroup label="خدمات الفرع المختار">
+                    {serviceOptions.map((service) => (
                       <option key={service.id} value={service.id}>
-                        {service.nameAr} - {Number(service.price).toFixed(0)} ج.م
+                        {service.displayNameAr} - {Number(service.price).toFixed(0)} ج.م
                       </option>
                     ))}
                   </optgroup>

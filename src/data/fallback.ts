@@ -3,10 +3,9 @@
 import {
   servicesData,
   barbersData,
-  testimonialsData,
   offersData,
 } from "./seed-data";
-import type { Service, Barber, Testimonial, Offer } from "@/db/schema";
+import type { Service, Barber, Offer } from "@/db/schema";
 
 /** يضيف id وتاريخ إنشاء للصفوف الاحتياطية علشان تطابق شكل صفوف الداتابيز */
 function withIds<T extends object>(rows: T[]): (T & {
@@ -22,6 +21,5 @@ function withIds<T extends object>(rows: T[]): (T & {
 
 export const fallbackServices = withIds(servicesData) as unknown as Service[];
 export const fallbackBarbers = withIds(barbersData) as unknown as Barber[];
-export const fallbackTestimonials =
-  withIds(testimonialsData) as unknown as Testimonial[];
+export const fallbackTestimonials = [];
 export const fallbackOffers = withIds(offersData) as unknown as Offer[];
