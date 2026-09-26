@@ -3,6 +3,7 @@ import { Clock, Info, Scissors } from "lucide-react";
 import type { Service } from "@/db/schema";
 import { asset } from "@/lib/base-path";
 import { primaryBranch } from "@/data/branches";
+import BookServiceButton from "@/components/BookServiceButton";
 
 interface ServicesProps {
   services: Service[];
@@ -61,6 +62,8 @@ export default function Services({ services }: ServicesProps) {
                   <Clock className="h-4 w-4" />
                   <span>{service.durationMinutes} دقيقة</span>
                 </div>
+                {/* زر حجز مخصوص للخدمة دي — بينزل لنموذج الحجز وبتحدد الخدمة تلقائياً */}
+                <BookServiceButton serviceId={service.id} />
               </div>
             </div>
           ))}

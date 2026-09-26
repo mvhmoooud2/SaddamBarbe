@@ -433,8 +433,8 @@ export const testimonialsData: NewTestimonial[] = [
 
 export const offersData: NewOffer[] = [
   {
-    titleAr: "عرض العريس بـ 2900",
-    titleEn: "Groom Package 2900",
+    titleAr: "عرض العريس VIP",
+    titleEn: "Groom VIP Package",
     descriptionAr:
       "تجربة متكاملة تخليك في أفضل لوك وأعلى استرخاء قبل أهم يوم في حياتك.",
     descriptionEn:
@@ -481,8 +481,8 @@ export const offersData: NewOffer[] = [
     isActive: true,
   },
   {
-    titleAr: "عرض العريس بـ 1800",
-    titleEn: "Groom Package 1800",
+    titleAr: "عرض العريس 1",
+    titleEn: "Groom Package 1",
     descriptionAr:
       "تجربة متكاملة تخليك في أفضل لوك وأعلى استرخاء قبل أهم يوم في حياتك.",
     descriptionEn:
@@ -527,8 +527,8 @@ export const offersData: NewOffer[] = [
     isActive: true,
   },
   {
-    titleAr: "عرض العريس بـ 1000",
-    titleEn: "Groom Package 1000",
+    titleAr: "عرض العريس 2",
+    titleEn: "Groom Package 2",
     descriptionAr:
       "تجربة متكاملة تخليك في أفضل لوك وأعلى استرخاء قبل أهم يوم في حياتك.",
     descriptionEn:
@@ -567,11 +567,11 @@ export const offersData: NewOffer[] = [
     isActive: true,
   },
   {
-    titleAr: "عرض SADDAM بـ 700",
-    titleEn: "SADDAM Offer 700",
-    descriptionAr: "محتاج تروق على نفسك؟ الحق عرض SADDAM بسعر مخفّض.",
+    titleAr: "عرض العريس 3",
+    titleEn: "Groom Package 3",
+    descriptionAr: "محتاج تروق على نفسك؟ الحق عرض العريس 3 بسعر مخفّض.",
     descriptionEn:
-      "Need to treat yourself? Grab the SADDAM offer at a discounted price.",
+      "Need to treat yourself? Grab the Groom Package 3 at a discounted price.",
     detailsAr: [
       "قص شعر.",
       "سشوار.",
