@@ -176,7 +176,7 @@ export const servicesData: NewService[] = [
       "Covering thin patches with toppik powder in a shade that matches your hair.",
     price: "150.00",
     durationMinutes: 30,
-    imageUrl: "/images/service-coloring-saddam.jpeg",
+    imageUrl: "/images/service-toppik.jpeg",
     isActive: true,
   },
 

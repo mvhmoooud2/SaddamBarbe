@@ -25,6 +25,7 @@ const serviceImageOverrides: Record<string, string[]> = {
     "/images/service-blow-dry-1.jpeg",
     "/images/service-blow-dry-2.jpeg",
   ],
+  توبيك: ["/images/service-toppik.jpeg"],
 };
 
 export default function Services({ services }: ServicesProps) {
