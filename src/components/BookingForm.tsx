@@ -16,6 +16,7 @@ import type { Service } from "@/db/schema";
 import { basePath } from "@/lib/base-path";
 import { siteConfig, whatsappLinkTo } from "@/data/site-config";
 import { branches, branchWhatsappLinkWithMessage } from "@/data/branches";
+import { BOOK_SERVICE_EVENT } from "@/components/BookServiceButton";
 
 interface BookingFormProps {
   services: Service[];
@@ -45,6 +46,8 @@ export default function BookingForm({ services }: BookingFormProps) {
   const [minDate, setMinDate] = useState("");
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [whatsappFallback, setWhatsappFallback] = useState<string | null>(null);
+  // إضاءة مؤقتة للفورم لما الزائر ييجي من زر «احجز هذه الخدمة»
+  const [isHighlighted, setIsHighlighted] = useState(false);
 
   useEffect(() => {
     // التاريخ بيتحسب في المتصفح بعد التحميل، لأن السيرفر (أو وقت البناء في
@@ -52,6 +55,33 @@ export default function BookingForm({ services }: BookingFormProps) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMinDate(localToday());
   }, []);
+
+  // لما الزائر يضغط «احجز هذه الخدمة» من كارت خدمة، بنحدد الخدمة دي
+  // تلقائياً في قائمة الفورم وبنضوي على الفورم لحظة علشان يلاقيه بسرعة
+  useEffect(() => {
+    const onBookService = (event: Event) => {
+      const serviceId = (event as CustomEvent<number>).detail;
+      if (
+        !services.some((service) => String(service.id) === String(serviceId))
+      ) {
+        return;
+      }
+      setFormData((prev) => ({ ...prev, serviceId: String(serviceId) }));
+      setMessage(null);
+      setWhatsappFallback(null);
+      setIsHighlighted(true);
+    };
+
+    window.addEventListener(BOOK_SERVICE_EVENT, onBookService);
+    return () => window.removeEventListener(BOOK_SERVICE_EVENT, onBookService);
+  }, [services]);
+
+  // الإضاءة بتروح لوحدها بعد لحظة
+  useEffect(() => {
+    if (!isHighlighted) return;
+    const timer = setTimeout(() => setIsHighlighted(false), 2000);
+    return () => clearTimeout(timer);
+  }, [isHighlighted]);
 
   // مواعيد الحجز مطابقة لمواعيد الفرعين الفعلية (من 11:00 صباحاً حتى بعد منتصف الليل)
   const availableTimes = [
@@ -182,7 +212,11 @@ export default function BookingForm({ services }: BookingFormProps) {
 
         <form
           onSubmit={handleSubmit}
-          className="rounded-3xl border border-[#c9a227]/20 bg-[#0f0f0f] p-8 shadow-[0_24px_60px_rgba(0,0,0,0.4)] md:p-10"
+          className={`rounded-3xl border bg-[#0f0f0f] p-8 shadow-[0_24px_60px_rgba(0,0,0,0.4)] transition-all duration-500 md:p-10 ${
+            isHighlighted
+              ? "border-[#c9a227] shadow-[0_0_50px_rgba(201,162,39,0.2)]"
+              : "border-[#c9a227]/20"
+          }`}
         >
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
