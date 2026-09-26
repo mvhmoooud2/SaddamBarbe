@@ -11,9 +11,12 @@ import Testimonials from "@/components/Testimonials";
 import Footer from "@/components/Footer";
 import FixedWhatsappButton from "@/components/FixedWhatsappButton";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 // كل محتوى الصفحة (الخدمات، العروض، الفروع، الصور، النصوص، أرقام التواصل)
-// بيتحمّل من قاعدة البيانات علشان يتعدّل من لوحة التحكم /admin.
-// في نسخة GitHub Pages أو لو الداتابيز مش متاحة بنستخدم البيانات الثابتة.
+// بيتحمّل من قاعدة بيانات Supabase بشكل Dynamic علشان يتعدّل من لوحة التحكم /admin.
+// في حالة عدم توفر الاتصال يتم استخدام البيانات الاحتياطية تلقائياً.
 async function getContent() {
   if (process.env.STATIC_EXPORT === "1") return staticContent();
   await connection();

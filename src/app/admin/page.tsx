@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { isAuthenticated } from "@/lib/admin-auth";
-import LoginForm from "@/components/admin/LoginForm";
-import AdminDashboard from "@/components/admin/AdminDashboard";
+import AdminPageClient from "@/components/admin/AdminPageClient";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +10,6 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminPage() {
-  if (!(await isAuthenticated())) return <LoginForm />;
-  return <AdminDashboard />;
+  const authenticated = await isAuthenticated();
+  return <AdminPageClient initialAuthenticated={authenticated} />;
 }

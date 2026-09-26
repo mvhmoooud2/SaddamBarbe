@@ -27,6 +27,8 @@ import {
   defaultSettings,
   type SiteSettingsMap,
 } from "@/data/settings-schema";
+import { createClientServer } from "./supabase/server";
+import { isSupabaseConfigured } from "./supabase/config";
 
 export type SiteContent = {
   services: Service[];
@@ -39,29 +41,29 @@ export type SiteContent = {
 };
 
 /** بيحوّل صف الفرع من قاعدة البيانات لنفس شكل الفرع المستخدم في الواجهة */
-export function branchRowToBranch(row: BranchRow): Branch {
+export function branchRowToBranch(row: any): Branch {
   return {
-    id: row.slug,
-    nameAr: row.nameAr,
-    listingNameAr: row.listingNameAr ?? undefined,
-    badgeAr: row.badgeAr ?? undefined,
-    addressAr: row.addressAr,
-    landmarkAr: row.landmarkAr ?? undefined,
-    summaryAr: row.summaryAr ?? undefined,
-    phoneDisplay: row.phoneDisplay,
-    phoneHref: row.phoneHref,
+    id: row.slug || String(row.id),
+    nameAr: row.nameAr || row.name_ar,
+    listingNameAr: row.listingNameAr ?? row.listing_name_ar ?? undefined,
+    badgeAr: row.badgeAr ?? row.badge_ar ?? undefined,
+    addressAr: row.addressAr || row.address_ar,
+    landmarkAr: row.landmarkAr ?? row.landmark_ar ?? undefined,
+    summaryAr: row.summaryAr ?? row.summary_ar ?? undefined,
+    phoneDisplay: row.phoneDisplay || row.phone_display,
+    phoneHref: row.phoneHref || row.phone_href,
     whatsapp: row.whatsapp,
-    hoursAr: row.hoursAr,
+    hoursAr: row.hoursAr || row.hours_ar,
     lat: row.lat ?? undefined,
     lng: row.lng ?? undefined,
-    priceListImage: row.priceListImage ?? undefined,
-    googleRating: row.googleRating ?? undefined,
-    googleReviews: row.googleReviews ?? undefined,
-    mapsUrl: row.mapsUrl ?? undefined,
+    priceListImage: row.priceListImage ?? row.price_list_image ?? undefined,
+    googleRating: row.googleRating ?? row.google_rating ?? undefined,
+    googleReviews: row.googleReviews ?? row.google_reviews ?? undefined,
+    mapsUrl: row.mapsUrl ?? row.maps_url ?? undefined,
   } as Branch;
 }
 
-function galleryRowsToItems(rows: GalleryImage[]) {
+function galleryRowsToItems(rows: (GalleryImage | { src: string; alt: string } | any)[]) {
   return rows.map((row) => ({ src: row.src, alt: row.alt }));
 }
 
@@ -79,12 +81,173 @@ export function staticContent(): SiteContent {
 }
 
 /**
+ * جلب البيانات من Supabase
+ */
+async function loadFromSupabase(): Promise<SiteContent | null> {
+  try {
+    const supabase = await createClientServer();
+
+    const [
+      { data: services, error: sErr },
+      { data: offers, error: oErr },
+      { data: barbers, error: bErr },
+      { data: branches, error: brErr },
+      { data: gallery, error: gErr },
+      { data: testimonials, error: tErr },
+      { data: settings, error: stErr },
+    ] = await Promise.all([
+      supabase
+        .from("services")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .order("id", { ascending: true }),
+      supabase
+        .from("offers")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .order("id", { ascending: true }),
+      supabase
+        .from("barbers")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .order("id", { ascending: true }),
+      supabase
+        .from("branches")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .order("id", { ascending: true }),
+      supabase
+        .from("gallery_images")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .order("id", { ascending: true }),
+      supabase
+        .from("testimonials")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .order("id", { ascending: true }),
+      supabase.from("site_settings").select("*"),
+    ]);
+
+    if (sErr || oErr || brErr) {
+      console.warn("[supabase] Error fetching from tables:", { sErr, oErr, brErr });
+      return null;
+    }
+
+    const fallback = staticContent();
+
+    // Mapping Supabase snake_case rows to camelCase
+    const mappedServices: Service[] = (services || []).map((row: any) => ({
+      id: row.id,
+      nameAr: row.name_ar,
+      nameEn: row.name_en,
+      displayNameAr: row.display_name_ar,
+      categoryAr: row.category_ar,
+      descriptionAr: row.description_ar,
+      descriptionEn: row.description_en,
+      price: String(row.price),
+      durationMinutes: row.duration_minutes,
+      imageUrl: row.image_url,
+      branchSlugs: row.branch_slugs ?? "",
+      isFeatured: row.is_featured ?? true,
+      sortOrder: row.sort_order ?? 0,
+      isActive: row.is_active ?? true,
+      createdAt: new Date(row.created_at || Date.now()),
+    }));
+
+    const mappedOffers: Offer[] = (offers || []).map((row: any) => ({
+      id: row.id,
+      titleAr: row.title_ar,
+      titleEn: row.title_en,
+      descriptionAr: row.description_ar,
+      descriptionEn: row.description_en,
+      detailsAr: row.details_ar,
+      detailsEn: row.details_en,
+      oldPrice: String(row.old_price),
+      newPrice: String(row.new_price),
+      imageUrl: row.image_url,
+      badgeAr: row.badge_ar,
+      validUntil: row.valid_until ? new Date(row.valid_until) : null,
+      sortOrder: row.sort_order ?? 0,
+      isActive: row.is_active ?? true,
+      createdAt: new Date(row.created_at || Date.now()),
+    }));
+
+    const mappedBarbers: Barber[] = (barbers || []).map((row: any) => ({
+      id: row.id,
+      nameAr: row.name_ar,
+      nameEn: row.name_en,
+      roleAr: row.role_ar,
+      roleEn: row.role_en,
+      bioAr: row.bio_ar,
+      bioEn: row.bio_en,
+      imageUrl: row.image_url,
+      sortOrder: row.sort_order ?? 0,
+      isActive: row.is_active ?? true,
+      createdAt: new Date(row.created_at || Date.now()),
+    }));
+
+    const mappedBranches: Branch[] =
+      branches && branches.length > 0
+        ? branches.map(branchRowToBranch)
+        : fallback.branches;
+
+    const mappedGallery =
+      gallery && gallery.length > 0
+        ? galleryRowsToItems(gallery)
+        : fallback.gallery;
+
+    const mappedTestimonials: Testimonial[] = (testimonials || []).map((row: any) => ({
+      id: row.id,
+      customerName: row.customer_name,
+      commentAr: row.comment_ar,
+      commentEn: row.comment_en,
+      rating: row.rating,
+      sortOrder: row.sort_order ?? 0,
+      isActive: row.is_active ?? true,
+      createdAt: new Date(row.created_at || Date.now()),
+    }));
+
+    const settingsRows = (settings || []).map((row: any) => ({
+      key: row.key,
+      value: row.value,
+    }));
+
+    return {
+      services: mappedServices.length > 0 ? mappedServices : fallback.services,
+      offers: mappedOffers,
+      barbers: mappedBarbers.length > 0 ? mappedBarbers : fallback.barbers,
+      branches: mappedBranches,
+      gallery: mappedGallery,
+      testimonials: mappedTestimonials,
+      settings: mergeSettings(settingsRows),
+    };
+  } catch (error) {
+    console.warn("[supabase] Failed to load data from Supabase:", error);
+    return null;
+  }
+}
+
+/**
  * بيقرأ كل محتوى الموقع من قاعدة البيانات (الحاجات المفعّلة بس).
- * لو الداتابيز مش متاحة بيرجع المحتوى الثابت علشان الموقع مايفصلش.
+ * يدعم Supabase أولاً ثم Postgres المباشر ثم المحتوى الثابت لو مفيش اتصال.
  */
 export async function loadSiteContent(): Promise<SiteContent> {
   if (process.env.STATIC_EXPORT === "1") return staticContent();
 
+  // (1) تجربة القراءة من Supabase
+  if (isSupabaseConfigured) {
+    const supabaseData = await loadFromSupabase();
+    if (supabaseData) return supabaseData;
+  }
+
+  // (2) تجربة القراءة من اتصال PostgreSQL المباشر عبر Drizzle
   try {
     const [
       services,
@@ -147,7 +310,7 @@ export async function loadSiteContent(): Promise<SiteContent> {
     };
   } catch (error) {
     console.warn(
-      "[fallback] قاعدة البيانات غير متاحة — الموقع شغال بالبيانات الثابتة:",
+      "[fallback] قاعدة البيانات غير متاحة — الموقع شغال بالبيانات الاحتياطية:",
       error
     );
     return staticContent();

@@ -171,8 +171,14 @@ export default function Footer({
           </div>
         </div>
 
-        <div className="mt-12 border-t border-[#c9a227]/10 py-6 text-center text-sm text-[#f5f0e6]/50">
-          © {new Date().getFullYear()} {setting(settings, "siteNameEn")}. جميع الحقوق محفوظة.
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[#c9a227]/10 py-6 text-center text-sm text-[#f5f0e6]/50 sm:flex-row">
+          <p>© {new Date().getFullYear()} {setting(settings, "siteNameEn")}. جميع الحقوق محفوظة.</p>
+          <a
+            href="/admin"
+            className="flex items-center gap-1.5 rounded-lg border border-[#c9a227]/20 bg-[#c9a227]/5 px-3 py-1.5 text-xs text-[#c9a227] transition-all hover:border-[#c9a227] hover:bg-[#c9a227]/10"
+          >
+            🔒 لوحة تحكم الإدارة
+          </a>
         </div>
       </div>
     </footer>

@@ -220,10 +220,13 @@ export const adminResources: AdminResource[] = [
       "customerPhone",
       "appointmentDate",
       "status",
+      "notes",
     ],
     fields: [
       { name: "customerName", labelAr: "اسم العميل", type: "text", required: true },
       { name: "customerPhone", labelAr: "رقم الموبايل", type: "text", required: true },
+      { name: "serviceName", labelAr: "الخدمة المطلوبة", type: "text" },
+      { name: "branchSlug", labelAr: "الفرع", type: "text" },
       { name: "appointmentDate", labelAr: "ميعاد الحجز", type: "datetime", required: true },
       {
         name: "status",
@@ -237,7 +240,7 @@ export const adminResources: AdminResource[] = [
           { value: "cancelled", labelAr: "ملغي" },
         ],
       },
-      { name: "notes", labelAr: "ملاحظات", type: "textarea" },
+      { name: "notes", labelAr: "ملاحظات وتفاصيل الحجز", type: "textarea" },
     ],
   },
 ];

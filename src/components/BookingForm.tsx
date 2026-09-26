@@ -208,6 +208,7 @@ export default function BookingForm({
 
     try {
       const appointmentDate = new Date(`${formData.date}T${formData.time}`);
+      const selectedService = services.find((s) => s.id === Number(formData.serviceId));
 
       const response = await fetch(`${basePath}/api/appointments`, {
         method: "POST",
@@ -216,8 +217,9 @@ export default function BookingForm({
           customerName: formData.customerName,
           customerPhone: formData.customerPhone,
           serviceId: Number(formData.serviceId),
+          serviceName: selectedService?.nameAr || undefined,
+          branchSlug: formData.branchId,
           appointmentDate: appointmentDate.toISOString(),
-          // اسم الفرع بيتبعت جوه الملاحظات لأن جدول الحجوزات ملوش عمود للفرع
           notes: [branch?.nameAr, formData.notes].filter(Boolean).join(" — "),
         }),
       });
