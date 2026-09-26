@@ -91,7 +91,7 @@ export const servicesData: NewService[] = [
     descriptionEn: "Hair drying and styling with a neat finishing touch.",
     price: "150.00",
     durationMinutes: 20,
-    imageUrl: "/images/gallery-6.jpg",
+    imageUrl: "/images/service-blow-dry-2.jpeg",
     isActive: true,
   },
 
