@@ -12,7 +12,7 @@ import {
   Loader2,
   MessageCircle,
 } from "lucide-react";
-import type { Service } from "@/db/schema";
+import type { Service, Offer } from "@/db/schema";
 import { basePath } from "@/lib/base-path";
 import { siteConfig, whatsappLinkTo } from "@/data/site-config";
 import { branches, branchWhatsappLinkWithMessage } from "@/data/branches";
@@ -20,7 +20,11 @@ import { BOOK_SERVICE_EVENT } from "@/components/BookServiceButton";
 
 interface BookingFormProps {
   services: Service[];
+  offers: Offer[];
 }
+
+/** قيمة خيار العرض في قائمة الحجز (مميزة عن معرّفات الخدمات) */
+const offerValue = (id: number) => `offer-${id}`;
 
 const emptyForm = (services: Service[]) => ({
   customerName: "",
@@ -39,7 +43,7 @@ function localToday() {
   return local.toISOString().split("T")[0];
 }
 
-export default function BookingForm({ services }: BookingFormProps) {
+export default function BookingForm({ services, offers }: BookingFormProps) {
   const [formData, setFormData] = useState(() => emptyForm(services));
   const [isSubmitting, setIsSubmitting] = useState(false);
   // بنحددها بعد التحميل علشان مايحصلش اختلاف بين السيرفر والمتصفح (hydration)
@@ -106,6 +110,7 @@ export default function BookingForm({ services }: BookingFormProps) {
   /** نص رسالة الواتساب الجاهزة (بتُستخدم لما الـ API مش متاح) */
   const bookingText = () => {
     const service = services.find((item) => String(item.id) === formData.serviceId);
+    const offer = offers.find((item) => offerValue(item.id) === formData.serviceId);
     const branch = selectedBranch();
 
     return [
@@ -113,7 +118,9 @@ export default function BookingForm({ services }: BookingFormProps) {
       `الاسم: ${formData.customerName}`,
       `الموبايل: ${formData.customerPhone}`,
       branch ? `الفرع: ${branch.nameAr}` : "",
-      `الخدمة: ${service ? service.nameAr : "غير محددة"}`,
+      offer
+        ? `العرض: ${offer.titleAr} — ${Number(offer.newPrice).toFixed(0)} ج.م`
+        : `الخدمة: ${service ? service.nameAr : "غير محددة"}`,
       `الميعاد: ${formData.date} - ${formData.time}`,
       formData.notes ? `ملاحظات: ${formData.notes}` : "",
     ]
@@ -132,6 +139,11 @@ export default function BookingForm({ services }: BookingFormProps) {
       : whatsappLinkTo(siteConfig.whatsapp, text);
   };
 
+  /** هل العميل اختار عرض من قائمة «العروض»؟ */
+  const isOfferSelected = offers.some(
+    (item) => offerValue(item.id) === formData.serviceId
+  );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -140,6 +152,27 @@ export default function BookingForm({ services }: BookingFormProps) {
 
     const text = bookingText();
     const branch = selectedBranch();
+
+    // طلبات العروض بتتم على الواتساب على طول: العرض باقة كاملة (جلسات متعددة
+    // وغرف خاصة ومواعيد مرنة) فلازم تنسيق مع الفرع — بنجهّز الرسالة كاملة
+    // ونفتح الواتساب للعميل في ضغطة واحدة.
+    // (في نفس الوقت ده متوافق مع نسخة GitHub Pages اللي الحجز فيها واتساب أصلاً)
+    const offer = offers.find(
+      (item) => offerValue(item.id) === formData.serviceId
+    );
+    if (offer) {
+      const link = bookingWhatsappLink(text);
+      // بنفتح الواتساب فوراً جوه حدث الضغطة (قبل أي await) علشان
+      // مانتصادفش مانع النوافذ المنبثقة، وبنسيب الزر الأخضر كخطة بديلة
+      window.open(link, "_blank", "noopener,noreferrer");
+      setWhatsappFallback(link);
+      setMessage({
+        type: "success",
+        text: "طلب العرض جاهز! لو الواتساب ما افتحش تلقائياً، دوس زر الواتساب اللي تحت.",
+      });
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const appointmentDate = new Date(`${formData.date}T${formData.time}`);
@@ -280,7 +313,7 @@ export default function BookingForm({ services }: BookingFormProps) {
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm font-medium text-[#f5f0e6]/80">
                 <Calendar className="h-4 w-4 text-[#c9a227]" />
-                الخدمة
+                الخدمة أو العرض
               </label>
               <select
                 name="serviceId"
@@ -289,13 +322,35 @@ export default function BookingForm({ services }: BookingFormProps) {
                 required
                 className="w-full rounded-xl border border-[#c9a227]/20 bg-[#1a1a1a] px-4 py-3 text-[#f5f0e6] outline-none transition-colors focus:border-[#c9a227]"
               >
-                {services.length === 0 && <option value="">لا توجد خدمات متاحة</option>}
-                {services.map((service) => (
-                  <option key={service.id} value={service.id}>
-                    {service.nameAr} - {Number(service.price).toFixed(0)} ج.م
-                  </option>
-                ))}
+                {services.length === 0 && offers.length === 0 && (
+                  <option value="">لا توجد خدمات متاحة</option>
+                )}
+                {services.length > 0 && (
+                  <optgroup label="الخدمات">
+                    {services.map((service) => (
+                      <option key={service.id} value={service.id}>
+                        {service.nameAr} - {Number(service.price).toFixed(0)} ج.م
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+                {/* العروض تحت الخدمات في نفس القائمة */}
+                {offers.length > 0 && (
+                  <optgroup label="العروض">
+                    {offers.map((offer) => (
+                      <option key={offer.id} value={offerValue(offer.id)}>
+                        {offer.titleAr} - {Number(offer.newPrice).toFixed(0)} ج.م
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
               </select>
+              {isOfferSelected && (
+                <p className="text-xs leading-relaxed text-[#c9a227]/80">
+                  طلبات العروض بتتم عبر الواتساب علشان نرتب لك كل تفاصيل العرض
+                  (المواعيد والجلسات) مع الفرع على طول.
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -382,12 +437,19 @@ export default function BookingForm({ services }: BookingFormProps) {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-8 flex w-full items-center justify-center gap-2 rounded-full bg-[#c9a227] px-8 py-4 font-bold text-[#0f0f0f] transition-transform hover:scale-[1.02] disabled:opacity-70"
+            className={`mt-8 flex w-full items-center justify-center gap-2 rounded-full px-8 py-4 font-bold text-[#0f0f0f] transition-transform hover:scale-[1.02] disabled:opacity-70 ${
+              isOfferSelected ? "bg-[#25D366]" : "bg-[#c9a227]"
+            }`}
           >
             {isSubmitting ? (
               <>
                 <Loader2 className="h-5 w-5 animate-spin" />
                 جاري الحجز...
+              </>
+            ) : isOfferSelected ? (
+              <>
+                <MessageCircle className="h-5 w-5" />
+                ابعت طلب العرض على واتساب
               </>
             ) : (
               "تأكيد الحجز"

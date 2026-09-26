@@ -85,7 +85,7 @@ export default async function HomePage() {
         <Stats />
         <GallerySlider />
         <Branches />
-        <BookingForm services={servicesData} />
+        <BookingForm services={servicesData} offers={offersData} />
         <Testimonials testimonials={testimonialsData} />
       </main>
       <Footer />
