@@ -30,7 +30,7 @@ import { setting, type SiteSettingsMap } from "@/lib/site-settings";
  *
  * ولو الفرع عنده صورة قائمة أسعار (priceListImage) بتتعرض في بلوك
  * «قائمة الأسعار» تحت الخريطة — الصورة بتتحمّل بـ asset() علشان مسار
- * GitHub Pages (/SaddamBarbe) يبقى صح.
+ * GitHub Pages (/SaddamBarber) يبقى صح.
  */
 type BranchesProps = {
   branches?: Branch[];

@@ -3,7 +3,7 @@
 موقع تعريفي كامل (عربي / RTL) لصالون حلاقة: خدمات، عروض بخصومات، معرض صور،
 قسم «فروعنا» بخريطة لكل فرع، آراء العملاء، ونموذج حجز مواعيد.
 
-- **النسخة الحيّة على GitHub Pages:** https://mvhmoooud2.github.io/SaddamBarbe/
+- **النسخة الحيّة على GitHub Pages:** https://mvhmoooud2.github.io/SaddamBarberr/
   (نسخة ثابتة بالبيانات الأساسية، بدون قاعدة بيانات وبدون API)
 - **النسخة الكاملة** (بقاعدة بيانات + حجز فعلي): تشتغل بـ Next.js + PostgreSQL.
 
@@ -44,13 +44,13 @@ npm run dev                    # http://localhost:3000
 
 ```bash
 npm run build:pages      # بينتج مجلد out/
-npm run preview:static   # يعرضها على http://localhost:4000/SaddamBarbe/
+npm run preview:static   # يعرضها على http://localhost:4000/SaddamBarberr/
 ```
 
 ### ⚠️ قاعدة مهمة
 
 GitHub Pages بيخدم الموقع على `/<اسم-المستودع>` وليس على الجذر، والمستودع اسمه
-`SaddamBarbe`، فالمسار هو **`/SaddamBarbe`**.
+`SaddamBarber`، فالمسار هو **`/SaddamBarber`**.
 
 لازم `NEXT_PUBLIC_BASE_PATH` يساوي نفس المسار في بناء نسخة Pages
 (الـ workflow بيظبطه تلقائياً). لو المسار غلط، ملفات CSS/JS والصور كلها بترجع 404

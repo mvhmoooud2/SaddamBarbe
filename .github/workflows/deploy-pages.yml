@@ -31,15 +31,15 @@ jobs:
         run: npm ci --no-audit --no-fund
 
       # مهم: مسار النشر (NEXT_PUBLIC_BASE_PATH) لازم يطابق اسم المستودع
-      # (SaddamBarbe) وإلا ملفات CSS/JS/الصور كلها ترجع 404 والصفحة تظهر بدون تصميم
+      # (SaddamBarber) وإلا ملفات CSS/JS/الصور كلها ترجع 404 والصفحة تظهر بدون تصميم
       - name: Build static export
         run: |
-          # API routes مش مدعومة في التصدير الثابت
-          rm -rf src/app/api
+          # API routes ولوحة التحكم محتاجين سيرفر + قاعدة بيانات → مش جزء من النسخة الثابتة
+          rm -rf src/app/api src/app/admin
           npx next build
         env:
           STATIC_EXPORT: "1"
-          NEXT_PUBLIC_BASE_PATH: /SaddamBarbe
+          NEXT_PUBLIC_BASE_PATH: /SaddamBarber
 
       - uses: actions/configure-pages@v5
         with:

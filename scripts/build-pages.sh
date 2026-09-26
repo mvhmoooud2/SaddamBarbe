@@ -14,7 +14,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 export STATIC_EXPORT=1
-export NEXT_PUBLIC_BASE_PATH="${NEXT_PUBLIC_BASE_PATH:-/SaddamBarbe}"
+export NEXT_PUBLIC_BASE_PATH="${NEXT_PUBLIC_BASE_PATH:-/SaddamBarber}"
 
 BACKUP_DIR="$(mktemp -d)"
 MOVED_API=0
